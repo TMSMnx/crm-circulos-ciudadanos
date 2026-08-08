@@ -1,0 +1,19 @@
+# ============================================================
+# tessdata/.htaccess
+# Tesseract.js maneja la descompresión de los .gz internamente.
+# Sin estas directivas, Apache los descomprimiría antes de enviarlos
+# al navegador → Tesseract recibiría un archivo corrupto.
+# ============================================================
+
+# Servir .gz como binario puro — sin descomprimir
+<FilesMatch "\.gz$">
+    RemoveEncoding .gz
+    AddType application/octet-stream .gz
+    Header set Content-Encoding identity
+</FilesMatch>
+
+# Permitir acceso a los archivos de tessdata (override del bloqueo .gz del padre)
+<FilesMatch "\.traineddata\.gz$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

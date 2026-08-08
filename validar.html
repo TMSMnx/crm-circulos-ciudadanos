@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador de Credenciales — Círculos Ciudadanos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            background: #ff7e00;
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        header img { height: 40px; border-radius: 4px; }
+        header h1 { font-size: 16px; font-weight: 700; line-height: 1.2; }
+        header p  { font-size: 11px; opacity: 0.85; }
+
+        .container { width: 100%; max-width: 480px; padding: 20px 16px; }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; }
+
+        .result-box {
+            display: none;
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 16px;
+        }
+        .result-box.found {
+            background: #e8f5e9;
+            border: 2px solid #43a047;
+        }
+        .result-box.not-found {
+            background: #ffebee;
+            border: 2px solid #e53935;
+        }
+        .result-box h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .result-box.found h2  { color: #2e7d32; }
+        .result-box.not-found h2 { color: #c62828; }
+
+        .result-box p { font-size: 13px; color: #333; margin: 4px 0; }
+        .result-box p strong { color: #111; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+        .badge-coord { background: #ff7e00; color: white; }
+        .badge-int   { background: #1565c0; color: white; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .btn-primary { background: #ff7e00; color: white; }
+        .btn-secondary { background: #1565c0; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .manual-section h3 { font-size: 14px; color: #555; margin-bottom: 10px; }
+        .manual-section input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #ff7e00;
+            font-weight: bold;
+        }
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ff7e00;
+            background: white;
+            color: #ff7e00;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .tab-btn.active {
+            background: #ff7e00;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="img/circulos.jpg" alt="Logo" onerror="this.style.display='none'">
+    <div>
+        <h1>Validador de Credenciales</h1>
+        <p>Círculos Ciudadanos — Movimiento Ciudadano</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tabQR"   onclick="switchTab('qr')">📷 Escanear QR</button>
+            <button class="tab-btn"        id="tabManual" onclick="switchTab('manual')">⌨️ Buscar CURP</button>
+        </div>
+
+        <!-- QR Scanner -->
+        <div id="panelQR">
+            <div id="reader"></div>
+            <button class="btn btn-primary"   id="btnStartScan" onclick="startScanner()">▶ Iniciar Escáner</button>
+            <button class="btn btn-secondary" id="btnStopScan"  onclick="stopScanner()" style="display:none;">⏹ Detener Escáner</button>
+        </div>
+
+        <!-- Manual CURP search -->
+        <div id="panelManual" style="display:none;" class="manual-section">
+            <h3>Ingresa el CURP del integrante:</h3>
+            <input type="text" id="inputCurp" placeholder="Ej: GOML850101HDFLPR08" maxlength="18"
+                   oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')buscarPorCurp()">
+            <button class="btn btn-primary" onclick="buscarPorCurp()">🔍 Verificar</button>
+        </div>
+
+        <div class="spinner" id="spinner">⏳ Verificando en la base de datos...</div>
+
+        <div class="result-box" id="resultBox"></div>
+
+        <button class="btn" id="btnNueva" onclick="resetValidator()"
+                style="display:none; background:#607d8b; color:white;">🔄 Nueva Verificación</button>
+    </div>
+
+</div>
+
+<script>
+let html5QrCode = null;
+let scanning    = false;
+
+function switchTab(tab) {
+    document.getElementById('tabQR').classList.toggle('active',     tab === 'qr');
+    document.getElementById('tabManual').classList.toggle('active', tab === 'manual');
+    document.getElementById('panelQR').style.display     = tab === 'qr'     ? '' : 'none';
+    document.getElementById('panelManual').style.display = tab === 'manual' ? '' : 'none';
+    if (tab !== 'qr' && scanning) stopScanner();
+}
+
+function startScanner() {
+    if (scanning) return;
+    scanning = true;
+    document.getElementById('btnStartScan').style.display = 'none';
+    document.getElementById('btnStopScan').style.display  = '';
+
+    html5QrCode = new Html5Qrcode('reader');
+    html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess,
+        () => {}
+    ).catch(err => {
+        alert('No se pudo acceder a la cámara: ' + err);
+        stopScanner();
+    });
+}
+
+function stopScanner() {
+    scanning = false;
+    document.getElementById('btnStartScan').style.display = '';
+    document.getElementById('btnStopScan').style.display  = 'none';
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+        html5QrCode = null;
+    }
+}
+
+function onScanSuccess(decodedText) {
+    stopScanner();
+    let payload = {};
+    try { payload = JSON.parse(decodedText); } catch(e) {
+        mostrarResultado(null, 'QR no reconocido o inválido.');
+        return;
+    }
+
+    // Validate credential type
+    if (payload.t !== 'cred' && !payload.curp && !payload.id) {
+        mostrarResultado(null, 'Este QR no corresponde a una credencial de Círculos Ciudadanos.');
+        return;
+    }
+
+    verificar(payload.curp || '', payload.id || '');
+}
+
+function buscarPorCurp() {
+    const curp = document.getElementById('inputCurp').value.trim();
+    if (curp.length < 10) { alert('Ingresa un CURP válido.'); return; }
+    verificar(curp, '');
+}
+
+async function verificar(curp, credId) {
+    document.getElementById('spinner').style.display = 'block';
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('btnNueva').style.display = 'none';
+
+    try {
+        const params = new URLSearchParams();
+        if (curp)   params.set('curp',    curp);
+        if (credId) params.set('cred_id', credId);
+
+        const res  = await fetch(`api.php?action=validate_credential&${params.toString()}`);
+        const data = await res.json();
+        mostrarResultado(data);
+    } catch(e) {
+        mostrarResultado(null, 'Error de conexión con el servidor.');
+    } finally {
+        document.getElementById('spinner').style.display = 'none';
+    }
+}
+
+function mostrarResultado(data, errorMsg) {
+    const box = document.getElementById('resultBox');
+
+    if (!data || data.status === 'error' || data.status === 'not_found' || errorMsg) {
+        const msg = errorMsg || data?.message || 'Credencial no encontrada en la base de datos.';
+        box.className = 'result-box not-found';
+        box.innerHTML = `
+            <h2>❌ No Verificado</h2>
+            <p>${msg}</p>
+        `;
+    } else {
+        const badgeClass = data.rol?.includes('Coordinador') ? 'badge-coord' : 'badge-int';
+        const seccionHtml = data.seccion ? `<p><strong>Sección Electoral:</strong> ${data.seccion}</p>` : '';
+        box.className = 'result-box found';
+        box.innerHTML = `
+            <h2>✅ Credencial Verificada</h2>
+            <span class="badge ${badgeClass}">${data.rol}</span>
+            <p style="margin-top:10px;"><strong>Nombre:</strong> ${data.nombre}</p>
+            <p><strong>Círculo:</strong> ${data.circulo}</p>
+            <p><strong>Estado:</strong> ${data.estado}</p>
+            <p><strong>Municipio:</strong> ${data.municipio}</p>
+            ${seccionHtml}
+            ${data.curp ? `<p><strong>CURP:</strong> <small>${data.curp}</small></p>` : ''}
+        `;
+    }
+
+    box.style.display = 'block';
+    document.getElementById('btnNueva').style.display = 'block';
+}
+
+function resetValidator() {
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('btnNueva').style.display  = 'none';
+    document.getElementById('inputCurp').value = '';
+}
+</script>
+</body>
+</html>

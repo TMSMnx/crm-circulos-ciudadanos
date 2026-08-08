@@ -1,0 +1,1892 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <meta name="theme-color" content="#ff7e00">
+  <title>CRM — Círculos Ciudadanos</title>
+  
+  <link rel="stylesheet" href="style.css?v=15.29" />
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="apple-touch-icon" href="icono-app.png?v=15.29">
+  
+  <link rel="icon" type="image/png" href="icono-app.png?v=15.29"> 
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  
+  <script src="js/tesseract.min.js?v=15.29"></script><!-- Auto-hospedado: mismo paquete que worker/core en /js/ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <script src="vendor/leaflet/leaflet.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    /* Estilos Integrados para Splash Screen */
+    #splash-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: white; z-index: 9999; display: flex; flex-direction: column; 
+        align-items: center; justify-content: center; transition: opacity 0.5s ease;
+    }
+    .spinner-splash {
+        border: 4px solid #f3f3f3; border-top: 4px solid #ff7e00; 
+        border-radius: 50%; width: 50px; height: 50px; animation: spin-splash 1s linear infinite;
+    }
+    @keyframes spin-splash { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse-splash { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    .fade-out-splash { opacity: 0 !important; pointer-events: none; }
+    
+    /* 🔥 Efecto de latido para el puntito verde del Radar 🔥 */
+    @keyframes pulse-green {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+    .radar-dot-active {
+        width: 12px; height: 12px; border-radius: 50%; background-color: #28a745;
+        animation: pulse-green 2s infinite;
+    }
+    .radar-dot-away {
+        width: 12px; height: 12px; border-radius: 50%; background-color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="splash-screen">
+      <img src="img/circulos.jpg" alt="Logo" style="width: 160px; margin-bottom: 25px; animation: pulse-splash 1.8s infinite;">
+      <div class="spinner-splash"></div>
+      <p style="margin-top: 20px; font-family: sans-serif; color: #333; font-weight: bold; letter-spacing: 1px;">Sincronizando con la Nube...</p>
+      <div id="db-loading-indicator" style="margin-top: 10px; font-size: 12px; color: #666;">Conectando...</div>
+  </div>
+  
+  <div class="centered-container" id="login-screen">
+    <div class="login-box">
+      <h2>Acceso al CRM</h2>
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Usuario" required />
+        
+        <div class="password-container" style="margin-bottom: 15px;">
+            <input type="password" id="password" placeholder="Contraseña" required />
+            <i class="toggle-eye" onclick="window.togglePassword('password', this)">👁️</i>
+        </div>
+
+        <button class="primary-btn" type="submit" id="btnLogin">Ingresar</button>
+        <p id="login-error" class="error-msg"></p>
+        <div id="version-container" class="version-tag">
+           Versión <span id="app-version">15.8</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard" class="dashboard" style="display:none;">
+    <div class="header">
+      <h1 style="color:#ff7e00; margin:0">CRM Círculos Ciudadanos <small id="app-version-tag" style="font-size:12px; color:#ffcc80; font-weight:normal; vertical-align:middle; opacity:0.9; letter-spacing:0.5px;"></small></h1>
+      <div class="header-controls">
+        <div class="user-profile-display">
+            <img id="headerUserImage" src="" alt="Perfil" class="profile-avatar" style="display:none;">
+            <span id="welcomeMsg"></span>
+        </div>
+        <button class="secondary-btn" id="btnEditProfile">✏️ Mi Perfil</button>
+        <button class="secondary-btn" id="btnLogout">Cerrar Sesión</button>
+      </div>
+    </div>
+    
+    <div class="content">
+      
+      <div id="offlineSyncAlert" style="display:none; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size: 24px;">📡</span>
+              <div>
+                  <strong>Modo Sin Conexión Activado</strong>
+                  <p style="margin:0; font-size: 12px;">Tienes círculos guardados localmente. Conéctate a WiFi/Datos para subirlos.</p>
+              </div>
+          </div>
+          <button id="btnSyncNow" class="primary-btn" style="background: #28a745; margin:0; padding: 8px 15px; font-size: 13px;">🔄 Subir Ahora (<span id="offlineCount">0</span>)</button>
+      </div>
+        
+      <div id="goalWidget" class="goal-container">
+          <div class="goal-header">
+              <h3 class="goal-title">🚀 Meta 2027: <span id="goalTargetName">Nacional</span></h3>
+              <span class="goal-badge" id="goalPercentageBadge">0%</span>
+          </div>
+          
+          <div class="progress-track">
+              <div id="goalProgressBar" class="progress-fill" style="width: 0%;">
+                  <span id="goalProgressTextInside" class="progress-text-inside"></span>
+              </div>
+          </div>
+
+          <div class="goal-stats">
+              <span>Avance Actual: <strong id="goalCurrent" class="stat-highlight">0</strong> círculos</span>
+              <span>Meta Objetivo: <strong id="goalTarget" class="stat-highlight">0</strong></span>
+          </div>
+          <p class="small" style="margin-top:5px; color:#999; font-style:italic;">
+              *Basado en la cobertura de secciones electorales (Factor 2.5).
+          </p>
+      </div>
+
+      <div class="filter-bar" style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span style="font-weight: bold; color: #555;">📍 Filtrar Tablero por:</span>
+          <select id="dashboardStateFilter" class="form-control" style="max-width: 300px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" onchange="window.updateStats()">
+              <option value="">🇲🇽 Todo el País (Nacional)</option>
+          </select>
+      </div>
+
+      <h2>Estadísticas Generales</h2>
+      <div class="stats-dashboard">
+        <!-- Fila 1: Tarjetas principales -->
+        <div class="stats-row">
+          <div class="stat-card stat-card--hero clickable-stat" onclick="showCircleList()">
+            Total Círculos
+            <span id="totalCircles">0</span>
+          </div>
+          <div class="stat-card stat-card--hero clickable-stat" onclick="showGlobalMemberList()">
+            Total Integrantes
+            <span id="totalIntegrantes">0</span>
+          </div>
+        </div>
+        <!-- Filas 2–6 generadas dinámicamente por updateStats() -->
+        <div id="dynamic-stats-container"></div>
+      </div>
+
+      <h2>Acciones</h2>
+      <div class="action-grid">
+        <button class="secondary-btn" onclick="window.abrirCentroMando()" style="background:#ff7e00; color:#fff; border:none; font-weight:bold;">🛡️ CENTRO DE MANDO</button>
+        
+        <button class="secondary-btn" id="btnRadar" onclick="window.abrirRadarOperadores()" style="display: none; background: #333; color: #fff; border: 1px solid #000;">
+            📡 Radar en Vivo
+        </button>
+        
+        <button class="secondary-btn" id="btnAuditoriaValidacion" onclick="window.abrirReporteValidacion()" style="display:none; background:#673ab7; color:#fff; border:none; font-weight:bold;">
+            📊 Auditoría de Validación
+        </button>
+
+        <button class="secondary-btn" id="btnExportarExcel" onclick="window.exportarCDBAExcel()" style="display: none; background: #1e7e34; color: #fff; border: 1px solid #155724;">
+            📊 Exportar a Excel
+        </button>
+
+        <button class="secondary-btn" onclick="showUserList('all')" style="background-color: #333; color: white;">👥 Ver TODOS los Usuarios</button>
+        <button class="secondary-btn" onclick="window.abrirEscanerQR(null)" style="background:#333; color:#fff;">📸 Escáner Validador</button>
+        
+        <button class="primary-btn" id="btnCreateCircle">Registrar Círculo</button>
+        <button class="secondary-btn" id="btnCreateUser" style="display:none;">👤 Crear Usuario/Delegado</button>
+        <button class="secondary-btn" id="btnReporteEstados">Reporte por Estado</button>
+        <button class="secondary-btn" id="btnReporteCircunscripciones">Reporte por Circunscripción</button>
+        <button class="secondary-btn" id="btnMisEventos">🗓️ Mis Eventos</button>
+        <button class="secondary-btn" id="btnMapaInteractivo">🗺️ Mapa Interactivo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSelectCircleType" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <span class="close" data-target="modalSelectCircleType">×</span>
+      <h3>Selecciona el Tipo de Círculo</h3>
+      <div class="action-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+        <button class="primary-btn" id="btnTypeLudico" style="margin:0; height: 100%; display: flex; align-items: center; justify-content: center;">Círculo Temático</button>
+        <button class="primary-btn" id="btnTypeCausas" style="margin:0; height: 100%; display: flex; align-items: center; justify-content: center;">Círculo de Causas</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSelectActivities" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large">
+      <span class="close" data-target="modalSelectActivities">×</span>
+      <h3>Selecciona Actividades Temáticas (Máx. 3)</h3>
+      <div id="activitiesGrid" class="options-grid"></div>
+      <p class="small">Actividades seleccionadas: <span id="countActivities">0</span></p>
+      <button class="primary-btn" id="btnActivitiesContinue" disabled>Continuar a Acta Constitutiva</button>
+    </div>
+  </div>
+
+  <div id="modalSelectCauses" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large">
+      <span class="close" data-target="modalSelectCauses">×</span>
+      <h3>Selecciona Causas de Interés (Máx. 3)</h3>
+      <div id="causesGrid" class="options-grid"></div>
+      <p class="small">Causas seleccionadas: <span id="countCauses">0</span></p>
+      <button class="primary-btn" id="btnCausesContinue" disabled>Continuar a Acta Constitutiva</button>
+    </div>
+  </div>
+
+  <div id="modalActa" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" data-target="modalActa">×</span>
+      <div style="background:#ff7e00;color:#fff;padding:14px 18px;border-radius:8px;margin:10px 0 18px 0;text-align:center;"><h2 style="margin:0;font-size:22px;letter-spacing:0.5px;">&#x1F4CB; ACTA CONSTITUTIVA DEL C&#xCD;RCULO CIUDADANO</h2><p style="margin:6px 0 0 0;font-size:13px;opacity:0.92;font-weight:600;">Documento 1 de 2 &middot; Paso 1</p></div>
+      <form id="formActa">
+        <label for="acta_nombre">Nombre del Círculo:</label>
+        <input type="text" id="acta_nombre" required />
+        <label for="acta_estado">Estado:</label>
+        <select id="acta_estado" required class="full-width-select"></select>
+        <label for="acta_municipio">Municipio:</label>
+        <select id="acta_municipio" class="full-width-select" required disabled>
+            <option value="">Selecciona un Estado primero</option>
+        </select>
+        <label for="acta_seccion">Sección Electoral (del domicilio del Coordinador):</label>
+        <input type="text" id="acta_seccion" placeholder="Ej: 1234" maxlength="4" pattern="\d{1,4}" style="width:100%;" />
+        <p class="small" style="margin-top:-8px; color:#666;">Número de sección electoral de 1 a 4 dígitos (ver reverso del INE).</p>
+        <label for="acta_fecha">Fecha de Creación:</label>
+        <input type="date" id="acta_fecha" value="" required />
+        <label for="acta_coordinador">Creador / Generador de este C&#xED;rculo Ciudadano:</label>
+        <input type="text" id="acta_coordinador" readonly />
+        <label for="acta_whatsapp">WhatsApp de Contacto:</label>
+        <input type="tel" id="acta_whatsapp" readonly />
+
+        <div style="background: #f0f4c3; padding: 10px; border-radius: 6px; margin: 15px 0; border: 1px solid #dce775;">
+            <label style="margin-top:0;">📍 Ubicación del Círculo (GPS):</label>
+            <div style="display:flex; gap:10px;">
+                 <input type="text" id="acta_lat" placeholder="Latitud" readonly style="font-size:12px; background:#fff;">
+                 <input type="text" id="acta_lng" placeholder="Longitud" readonly style="font-size:12px; background:#fff;">
+            </div>
+            <button type="button" class="secondary-btn small-btn" onclick="window.getCurrentLocation('acta_lat', 'acta_lng')" style="width:100%; margin-top:5px; background:#fff;">📡 Obtener mi ubicación actual</button>
+            <p class="small" style="color:#666; margin-top:5px; font-style:italic; font-size:11px;">
+                *Nota: Si no hay internet, el mapa no se verá, pero las coordenadas GPS sí se guardarán si tienes el GPS activo.
+            </p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <button type="submit" class="primary-btn">Guardar Acta y Continuar a Cédulas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalCedula" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" data-target="modalCedula">×</span>
+      <div style="background:#ff7e00;color:#fff;padding:14px 18px;border-radius:8px;margin:10px 0 18px 0;text-align:center;"><h2 style="margin:0;font-size:22px;letter-spacing:0.5px;">&#x1F4C4; C&#xC9;DULA DE REGISTRO DE INTEGRANTE</h2><p style="margin:6px 0 0 0;font-size:13px;opacity:0.92;font-weight:600;">Documento 2 de 2 &middot; Paso 2</p></div>
+      <div id="edit-mode-banner" style="display:none;background:#1565c0;color:#fff;padding:10px 16px;border-radius:8px;margin-bottom:14px;display:none;align-items:center;gap:10px;">
+        <span style="font-size:20px;">&#x270F;&#xFE0F;</span>
+        <div>
+          <strong style="font-size:13px;">MODO EDICI&#xD3;N &mdash; <span id="edit-circle-name-banner"></span></strong>
+          <br><small style="opacity:0.85;">Ya tiene <span id="edit-member-count-banner">0</span> integrante(s) registrados. Agrega los que necesites y presiona <em>Guardar Cambios</em> al terminar.</small>
+        </div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <strong style="color:#e65100;font-size:14px;">&#x1F464; Integrante <span id="contadorMiembrosActuales">1</span> de 18</strong>
+            <span id="barraProgreso_label" style="font-size:11px;color:#888;">M&#237;n: 6 &nbsp;&#183;&nbsp; &#211;ptimo: 10&#8211;14 &nbsp;&#183;&nbsp; M&#225;x: 18</span>
+        </div>
+        <div style="background:#e0e0e0;border-radius:20px;height:12px;overflow:hidden;">
+            <div id="barraProgreso" style="height:100%;border-radius:20px;transition:width 0.4s ease,background-color 0.4s ease;width:5.5%;background-color:#e53935;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:2px;padding:0 2px;">
+            <span>1</span><span style="color:#e53935;">3&#8195;m&#237;n</span><span style="color:#f9a825;">6</span><span style="color:#43a047;">9&#8195;&#243;pt</span><span>18 m&#225;x</span>
+        </div>
+    </div>
+      <p class="small" style="margin:0;">*Círculo: <strong id="currentCircleName"></strong></p>
+      
+      <form id="formCedula">
+        
+        <label>1. Foto del INE (Frente) — auto-llenado de datos:</label>
+        <div class="ine-capture-area">
+            <button type="button" class="primary-btn" onclick="window.openIneCapture()" style="width:100%; font-size:15px; padding:14px;">
+                📷 Tomar Foto con Cámara / Cargar Archivo
+            </button>
+            <p id="ine-capture-status" class="small" style="margin:8px 0 0 0; color:#888;">
+                Toca el botón para capturar o cargar la foto del INE.
+            </p>
+            <div style="text-align:center; margin-top:10px;">
+                <img id="cedula_ine_preview" src="" style="max-width:100%; max-height:140px; display:none; border:1px solid #ddd; border-radius:6px; margin:0 auto;">
+            </div>
+        </div>
+        <!-- Input oculto — mantiene compatibilidad con flujo heredado -->
+        <input type="file" id="cedula_ine" accept="image/*,.pdf" style="display:none;" />
+
+        <label style="color:#e65100;">📸 Foto de Perfil (Opcional — máx. 80 KB):</label>
+        <input type="file" id="cedula_foto_opcional" accept="image/*"
+               onchange="window.handleProfilePhotoSelect(this,'cedula_foto_preview','cedula_foto_badge')" />
+        <div id="cedula_foto_badge" class="img-size-badge" style="display:none;"></div>
+        <div style="text-align:center; margin-top:6px;">
+            <img id="cedula_foto_preview" src="" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #ff7e00; display:none;">
+        </div>
+        <p class="small" style="margin-top:5px;">Si no subes esta foto, se usará la del INE.</p>
+        
+        
+        <hr style="margin: 15px 0; border:0; border-top:1px dashed #ccc;">
+
+        <label for="cedula_nombre">Nombre Completo:</label>
+        <input type="text" id="cedula_nombre" required />
+
+        <div id="coordinador-checkbox-wrapper" style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin: 10px 0; border: 1px solid #90caf9;">
+            <input type="checkbox" id="cedula_es_coordinador" style="width: auto; margin-right: 10px;">
+            <label for="cedula_es_coordinador" style="display:inline; font-weight:bold; color:#0d47a1;">&#11088; Designar como Coordinador(a) del C&#237;rculo</label>
+        </div>
+        <div id="coordinador-ya-designado" style="display:none; background:#fff3e0; padding:10px; border-radius:5px; margin:10px 0; border:2px solid #ff7e00;">
+            <span style="color:#ff7e00; font-weight:bold;">&#11088; Coordinador(a) ya designado(a):</span>
+            <span id="coordinador-nombre-actual" style="font-weight:bold; color:#333; margin-left:6px;"></span>
+            <br><small style="color:#888;">Solo puede haber un(a) Coordinador(a) por C&#237;rculo Ciudadano.</small>
+        </div>
+
+        <label for="cedula_domicilio">Domicilio (según INE):</label>
+        <textarea id="cedula_domicilio" rows="2" placeholder="Ej: FRACC COLONIAL SATELITE 53119..."></textarea>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label for="cedula_clave_elector">Clave de Elector:</label>
+                <input type="text" id="cedula_clave_elector" maxlength="18" />
+            </div>
+            <div>
+                <label for="cedula_curp">CURP:</label>
+                <input type="text" id="cedula_curp" maxlength="18" />
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+            <div>
+                <label for="cedula_fecha_nacimiento">Fecha de Nacimiento:</label>
+                <input type="text" id="cedula_fecha_nacimiento" placeholder="dd/mm/aaaa" />
+            </div>
+            <div>
+                <label for="cedula_seccion">Sección Electoral:</label>
+                <input type="text" id="cedula_seccion" required />
+            </div>
+             <div>
+                <label for="cedula_sexo">Sexo:</label>
+                <select id="cedula_sexo">
+                    <option value="">Seleccionar...</option>
+                    <option value="H">Hombre</option>
+                    <option value="M">Mujer</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:10px 0 0 0;">
+            <div>
+                <label for="cedula_anio_registro">A&ntilde;o de Registro INE:</label>
+                <input type="text" id="cedula_anio_registro" placeholder="Ej: 2019" maxlength="4" pattern="\d{4}" />
+            </div>
+            <div>
+                <label for="cedula_vigencia_ine">Vigencia del INE:</label>
+                <input type="text" id="cedula_vigencia_ine" placeholder="Ej: 2029" maxlength="4" pattern="\d{4}" />
+            </div>
+        </div>
+        <hr style="margin: 20px 0;">
+
+        <label for="cedula_telefono">Teléfono (Contacto):</label>
+        <input type="tel" id="cedula_telefono" required />
+        <label for="cedula_email">Email (Contacto):</label>
+        <input type="email" id="cedula_email" />
+        <div style="border-left:3px solid #ff7e00;padding-left:12px;margin:12px 0 6px 0;">
+            <p style="margin:0 0 8px 0;font-weight:bold;color:#e65100;font-size:13px;">&#x1F4F1; Redes Sociales (Opcional)</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div>
+                    <label for="cedula_instagram" style="font-size:12px;">&#x1F4F8; Instagram:</label>
+                    <input type="text" id="cedula_instagram" placeholder="@usuario" style="font-size:13px;" />
+                </div>
+                <div>
+                    <label for="cedula_facebook" style="font-size:12px;">&#x1F4D8; Facebook:</label>
+                    <input type="text" id="cedula_facebook" placeholder="facebook.com/usuario" style="font-size:13px;" />
+                </div>
+                <div>
+                    <label for="cedula_x" style="font-size:12px;">&#x58; / Twitter:</label>
+                    <input type="text" id="cedula_x" placeholder="@usuario" style="font-size:13px;" />
+                </div>
+                <div>
+                    <label for="cedula_tiktok" style="font-size:12px;">TikTok:</label>
+                    <input type="text" id="cedula_tiktok" placeholder="@usuario" style="font-size:13px;" />
+                </div>
+            </div>
+        </div>
+        
+        <!-- CHECKLIST OPCIONES DE PARTICIPACION -->
+        <div style="background:#ff7e00;color:#fff;padding:12px 18px;border-radius:8px 8px 0 0;margin:20px 0 0 0;">
+            <h3 style="margin:0 0 2px 0;font-size:16px;">&#x2705; Opciones de Participaci&oacute;n</h3>
+            <p style="margin:0;font-size:12px;opacity:0.92;">Selecciona las que apliquen &mdash; la primera es <strong>obligatoria</strong></p>
+        </div>
+        <div style="border:2px solid #ff7e00;border-top:none;border-radius:0 0 8px 8px;margin-bottom:20px;overflow:hidden;">
+
+            <!-- Opción 1: OBLIGATORIA — Integrar Círculo -->
+            <div style="background:#fff3e0;padding:12px 15px;border-bottom:1px solid #ffe0b2;">
+                <label for="cedula_op_integrar" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:normal;">
+                    <input type="checkbox" id="cedula_op_integrar" name="cedula_op_integrar" required
+                           style="width:18px;height:18px;min-width:18px;margin-top:2px;accent-color:#ff7e00;"
+                           onchange="window.validarChecklistObligatorio(this)" />
+                    <span>
+                        <strong style="color:#bf360c;">&#x1F4CC; Me gustar&iacute;a integrar un C&iacute;rculo Ciudadano</strong>
+                        <span style="display:inline-block;background:#c62828;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle;">OBLIGATORIO</span><br>
+                        <small style="color:#777;">Debes seleccionar esta opci&oacute;n para continuar con el registro.</small>
+                    </span>
+                </label>
+            </div>
+
+            <!-- Opción 2 -->
+            <div style="background:#fff;padding:12px 15px;border-bottom:1px solid #ffe0b2;">
+                <label for="cedula_op_info" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal;">
+                    <input type="checkbox" id="cedula_op_info" name="cedula_op_info"
+                           style="width:18px;height:18px;min-width:18px;accent-color:#ff7e00;" />
+                    <span>&#x1F4E2; Me gustar&iacute;a recibir informaci&oacute;n de las actividades que realizan.</span>
+                </label>
+            </div>
+
+            <!-- Opción 3 -->
+            <div style="background:#fff3e0;padding:12px 15px;border-bottom:1px solid #ffe0b2;">
+                <label for="cedula_op_candidato" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal;">
+                    <input type="checkbox" id="cedula_op_candidato" name="cedula_op_candidato"
+                           style="width:18px;height:18px;min-width:18px;accent-color:#ff7e00;" />
+                    <span>&#x1F3C6; Me gustar&iacute;a ser candidato(a) o representante de Movimiento Ciudadano.</span>
+                </label>
+            </div>
+
+            <!-- Opción 4 -->
+            <div style="background:#fff;padding:12px 15px;">
+                <label for="cedula_op_afiliacion" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal;">
+                    <input type="checkbox" id="cedula_op_afiliacion" name="cedula_op_afiliacion"
+                           style="width:18px;height:18px;min-width:18px;accent-color:#ff7e00;" />
+                    <span>&#x1F91D; Por mi libre voluntad solicito mi afiliaci&oacute;n a Movimiento Ciudadano.</span>
+                </label>
+            </div>
+
+        </div>
+        
+        <!-- FIRMA: exclusion mutua autografa vs digital -->
+        <div style="background:#ff7e00;color:#fff;padding:12px 15px;border-radius:8px;margin:18px 0 0 0;">
+            <h3 style="margin:0 0 4px 0;font-size:16px;">&#x270D;&#xFE0F; Firma del Integrante</h3>
+            <p style="margin:0;font-size:12px;opacity:0.9;">Elige <strong>una sola</strong> forma de validar la firma &mdash; no ambas</p>
+        </div>
+        <div style="border:2px solid #ff7e00;border-top:none;border-radius:0 0 8px 8px;padding:14px 15px;margin-bottom:15px;">
+            <div style="display:flex;gap:10px;margin-bottom:14px;">
+                <label style="flex:1;cursor:pointer;font-weight:normal;padding:10px;border:2px solid #ff7e00;border-radius:6px;background:#fff3e0;" id="firma_tab_autografa">
+                    <input type="radio" name="firma_modo" value="autografa" checked onchange="window.toggleFirmaModo('autografa')" style="width:auto;margin-right:6px;">
+                    &#x270F;&#xFE0F; <strong>Firma Aut&oacute;grafa</strong>
+                </label>
+                <label style="flex:1;cursor:pointer;font-weight:normal;padding:10px;border:2px solid #ddd;border-radius:6px;" id="firma_tab_digital">
+                    <input type="radio" name="firma_modo" value="digital" onchange="window.toggleFirmaModo('digital')" style="width:auto;margin-right:6px;">
+                    &#x1F4BB; <strong>Firma Digital</strong> (CURP)
+                </label>
+            </div>
+            <div id="firma_seccion_autografa">
+                <canvas id="sigCanvas" class="signature-canvas" width="600" height="120"></canvas>
+                <button type="button" class="secondary-btn small-btn" id="btnClearSig" style="margin-top:6px;">Limpiar Firma</button>
+            </div>
+            <div id="firma_seccion_digital" style="display:none;">
+                <label for="cedula_firma_nombre">Nombre Completo (igual que arriba):</label>
+                <input type="text" id="cedula_firma_nombre" placeholder="Escriba su nombre completo" />
+                <label for="cedula_firma_curp">CURP (18 caracteres):</label>
+                <input type="text" id="cedula_firma_curp" placeholder="Ej: GOMA780916HDGRNR06" maxlength="18" style="text-transform:uppercase;" />
+            </div>
+        </div>
+        
+        <div class="small" style="border: 1px solid #eee; padding: 10px; margin-top: 15px; border-radius: 6px; background: #f9f9f9; font-size: 11px; line-height: 1.4;">
+            <strong>Aviso de privacidad simplificado:</strong> Movimiento Ciudadano, es responsable del tratamiento de los datos personales que nos proporcione, los cuales serán protegidos conforme lo dispuesto por la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados y demás normatividad que resulte aplicable. Los datos recabados, los utilizaremos para las siguientes finalidades: Verificar y confirmar su identidad, integrar expedientes y bases de datos, e invitación a eventos. No se realizarán transferencias de datos personales, salvo aquéllas necesarias para atender requerimientos de autoridad competente.
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <button type="button" class="primary-btn" id="btnNextIntegrante">Guardar Cédula y Registrar Otro</button>
+          <button type="button" class="secondary-btn" id="btnFinalizarCirculo">Finalizar Registro del Círculo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+        
+  <div id="modalOCR" class="modal" style="display:none;">
+      <div class="modal-content">
+          <span class="close" data-target="modalOCR">×</span>
+          <h3>Extraer Datos de PDF/Imagen (OCR)</h3>
+          <p class="small">Sube la cédula de registro (PDF o imagen) para auto-llenar el formulario.</p>
+          <input type="file" id="ocrFileInput" accept=".pdf,image/*" style="margin-bottom: 10px;" />
+          <button class="primary-btn" id="btnStartOCR">Iniciar OCR</button>
+          <div id="ocrProgress" style="margin-top: 15px;"></div>
+          <p id="ocrResultText" class="small" style="margin-top: 15px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;"></p>
+          <button class="secondary-btn" id="btnSaveOcrData" style="margin-top: 15px;" disabled>Aplicar Datos al Formulario</button>
+      </div>
+  </div>
+
+  <div id="modalReporteEstados" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large">
+      <span class="close" data-target="modalReporteEstados">×</span>
+      <h3>Reporte de Avance por Estado</h3>
+      
+      <div class="filters" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: flex-end; margin-bottom: 20px;">
+        <div>
+            <label for="reporte_estado_select">1. Seleccionar Estado:</label>
+            <select id="reporte_estado_select" class="full-width-select" style="margin: 0;" onchange="if(window.popularMunicipios && this.value && this.value!=='Todos') { window.popularMunicipios(this.value,'reporte_municipio_select'); document.getElementById('reporte_municipio_select').style.display=''; } else { document.getElementById('reporte_municipio_select').innerHTML='<option value=\'\'>Todos los Municipios</option>'; }"></select>
+        </div>
+        <div>
+            <label for="reporte_municipio_select">2. Municipio (opcional):</label>
+            <select id="reporte_municipio_select" class="full-width-select" style="margin: 0;">
+                <option value="">Todos los Municipios</option>
+            </select>
+        </div>
+        <div>
+            <label for="reporte_destinatario">3. Dirigido a:</label>
+            <input type="text" id="reporte_destinatario" placeholder="Nombre del Coordinador/a Estatal" style="margin: 0;"/>
+        </div>
+      </div>
+      
+      <div class="action-grid" style="margin-bottom: 20px;">
+          <button class="primary-btn" id="btnRunStateReport">Generar Vista Previa del Reporte</button>
+          <button class="secondary-btn" id="btnExportarReportePDF" disabled>Exportar a PDF</button>
+      </div>
+      
+      <div id="reporteEstadosContent" style="max-height: 500px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 10px;">
+        <p class="small">Selecciona un estado y haz clic en "Generar Vista Previa".</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalReporteCircunscripciones" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" data-target="modalReporteCircunscripciones">×</span>
+      <h3>Reporte de Avance por Circunscripción</h3>
+      <p class="small">Muestra el resumen de círculos e integrantes por Circunscripción Federal.</p>
+      <div id="reporteCircunscripcionesContent" style="max-height: 500px; overflow-y: auto;">
+      </div>
+      <div class="action-grid" style="margin-top: 15px; text-align: right;">
+          <button class="primary-btn" onclick="window.handleExportReporteNacionalPDF()">🖨️ Exportar PDF Nacional</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAuditoriaValidacion" class="modal" style="display:none;">
+      <div class="modal-content modal-content-large" style="border-top: 5px solid #673ab7; max-width: 900px;">
+          <span class="close" onclick="closeModal('modalAuditoriaValidacion')">×</span>
+          <h2 style="color: #673ab7; margin-top:0;">📊 Reporte de Auditoría de Validación</h2>
+          <p class="small" style="color: #666; margin-top: -10px; margin-bottom: 20px;">Control de rendimiento de la Mesa de Validación y mapa de rezago nacional.</p>
+          <div id="auditoria-validacion-content"></div>
+      </div>
+  </div>
+
+  <div id="modalMapa" class="modal">
+    <div class="modal-content" style="width:90%; height:92%; max-width:none; display:flex; flex-direction:column; gap:8px; box-sizing:border-box;">
+        <span class="close" data-target="modalMapa">×</span>
+        <h3 style="margin:0 0 4px 0;">🗺️ Mapa de Cobertura Nacional</h3>
+
+        <!-- Barra de vistas -->
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex-shrink:0;">
+          <button id="mapa-tab-gps"
+                  onclick="window.switchMapaVista('gps')"
+                  style="padding:6px 16px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;font-size:13px;background:#ff7e00;color:white;">
+            📍 GPS
+          </button>
+          <button id="mapa-tab-estados"
+                  onclick="window.switchMapaVista('estados')"
+                  style="padding:6px 16px;border-radius:20px;border:2px solid #ff7e00;cursor:pointer;font-weight:bold;font-size:13px;background:white;color:#ff7e00;">
+            🏛️ Por Estado
+          </button>
+          <button id="mapa-tab-municipios"
+                  onclick="window.switchMapaVista('municipios')"
+                  style="padding:6px 16px;border-radius:20px;border:2px solid #ff7e00;cursor:pointer;font-weight:bold;font-size:13px;background:white;color:#ff7e00;">
+            🏙️ Por Municipio
+          </button>
+          <span id="mapa-stats-label" style="margin-left:auto;font-size:12px;color:#888;font-style:italic;"></span>
+        </div>
+
+        <!-- Contenedor del mapa — toma el espacio restante -->
+        <div id="mapContainer" style="width:100%; flex:1; min-height:200px; border-radius:8px; border:1px solid #ccc;"></div>
+    </div>
+  </div>
+
+  <div id="modalCircleList" class="modal" style="display:none;">
+      <div class="modal-content modal-content-large">
+          <span class="close" data-target="modalCircleList">×</span>
+          <h3 id="circleListTitle">⭕ Listado de Círculos Ciudadanos</h3>
+          
+          <div class="filters" style="margin-bottom: 15px; background: #f4f7f6; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: flex-end; margin-bottom: 5px;">
+                  
+                  <div style="grid-column: span 2;">
+                      <label for="circleList_search" class="small" style="font-weight:bold; color:#333;">🔍 Buscar por Nombre del Círculo o Coordinador:</label>
+                      <input type="text" id="circleList_search" placeholder="Escribe un nombre para buscar..." onkeyup="window.applyCircleListFilters()" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                  </div>
+
+                  <div>
+                      <label for="circleList_state_select" class="small" style="font-weight:bold; color:#333;">📍 Estado:</label>
+                      <select id="circleList_state_select" class="full-width-select" onchange="window.onCircleListStateChange(this.value)" style="margin:0;"></select>
+                  </div>
+
+                  <div>
+                      <label for="circleList_cause_select" class="small" style="font-weight:bold; color:#333;">🎯 Causa / Actividad:</label>
+                      <select id="circleList_cause_select" class="full-width-select" onchange="window.applyCircleListFilters()" style="margin:0;">
+                          <option value="">Todas las Causas</option>
+                      </select>
+                  </div>
+
+                  <div>
+                      <label for="circleList_date_select" class="small" style="font-weight:bold; color:#333;">📅 Fecha de Creación:</label>
+                      <input type="date" id="circleList_date_select" onchange="window.applyCircleListFilters()" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin:0;">
+                  </div>
+
+                  <div>
+                      <label for="circleList_municipio_select" class="small" style="font-weight:bold; color:#333;">🏙️ Municipio:</label>
+                      <select id="circleList_municipio_select" class="full-width-select" onchange="window.applyCircleListFilters()" style="margin:0;">
+                          <option value="">Todos los Municipios</option>
+                      </select>
+                  </div>
+
+                  <div>
+                      <label for="circleList_seccion_input" class="small" style="font-weight:bold; color:#333;">🗳️ Sección Electoral:</label>
+                      <input type="text" id="circleList_seccion_input" placeholder="Ej: 1234" maxlength="4" onkeyup="window.applyCircleListFilters()" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin:0;">
+                  </div>
+
+                  <div style="display: flex; gap: 10px;">
+                      <button class="secondary-btn small-btn" style="background:#666; color:white; width:100%; margin:0;" onclick="document.getElementById('circleList_search').value=''; document.getElementById('circleList_state_select').value=''; document.getElementById('circleList_cause_select').value=''; document.getElementById('circleList_date_select').value=''; document.getElementById('circleList_municipio_select').innerHTML='<option value=\'\'>Todos los Municipios</option>'; document.getElementById('circleList_seccion_input').value=''; window.applyCircleListFilters();">🧹 Limpiar</button>
+
+                      <button class="secondary-btn small-btn" id="btnRescateCirculos" style="background:#dc3545; color:white; font-weight:bold; margin:0; width:100%;" onclick="window.abrirCentroMando(); setTimeout(()=>window.renderRescateCirculos(),400);" title="Abrir Rescate en Centro de Mando">
+                          🔴 Rescate
+                      </button>
+                      <button class="secondary-btn small-btn" onclick="window.abrirObservatorio()" style="background:#1b5e20; color:white; font-weight:bold; margin:0; width:100%;" title="Observatorio Ciudadano">
+                          &#x1F52D; Observatorio
+                      </button>
+                  </div>
+
+              </div>
+          </div>
+          
+          <div id="circleListContainer" style="max-height: 500px; overflow-y: auto;">
+              <table class="report-table">
+                  <thead>
+                      <tr>
+                          <th>Círculo</th>
+                          <th>Estado</th>
+                          <th>Causas (Completas)</th>
+                          <th># Int.</th>
+                          <th>Coordinador(a) Designado</th>
+                          <th>Estado Val.</th>
+                          <th>Acciones</th>
+                      </tr>
+                  </thead>
+                  <tbody id="circleListTbody">
+                      <tr><td colspan="7" style="text-align: center;">Cargando círculos...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalUserList" class="modal" style="display:none;">
+      <div class="modal-content modal-content-large">
+          <span class="close" data-target="modalUserList">×</span>
+          <h3 id="userListTitle">👥 Listado de Coordinadores</h3>
+          
+          <div class="filters" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+              
+              <div style="flex-grow: 1; min-width: 200px;">
+                  <label for="userList_search" class="small">Buscar:</label>
+                  <input type="text" id="userList_search" placeholder="🔍 Nombre, Usuario o Municipio..." 
+                         style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" 
+                         onkeyup="applyUserListFilters()">
+              </div>
+              <div>
+                  <label for="userList_state_select" class="small">Filtrar por Estado:</label>
+                  <select id="userList_state_select" class="full-width-select"></select>
+              </div>
+              <div id="userList_secondary_filter_container" style="display:none;">
+                  <label for="userList_secondary_select" id="userList_secondary_label" class="small">Filtrar por Detalle:</label>
+                  <select id="userList_secondary_select" class="full-width-select"></select>
+              </div>
+              <button class="secondary-btn small-btn" onclick="applyUserListFilters()">Aplicar Filtros</button>
+          </div>
+          
+          <input type="hidden" id="userListRole" value="">
+          
+          <div id="userListContainer" style="max-height: 500px; overflow-y: auto;">
+              <table class="report-table">
+                  <thead>
+                      <tr>
+                          <th>Nombre</th>
+                          <th>Estado</th>
+                          <th id="userListSecondaryHeader">Detalle</th>
+                          <th>Usuario</th>
+                          <th>WhatsApp</th>
+                          <th>Acciones</th>
+                      </tr>
+                  </thead>
+                  <tbody id="userListTbody">
+                      <tr><td colspan="6" style="text-align: center;">Selecciona una tarjeta de rol para ver la lista.</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalCreateUser" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 500px;"> <span class="close" data-target="modalCreateUser">×</span>
+      <h3 style="text-align: center;">👤 Crear Nuevo Coordinador</h3>
+      
+      <form id="formCreateUser">
+        <input type="hidden" id="u_id" value="">
+        
+        <div style="text-align:center; margin-bottom:20px;">
+            <label style="display:block; margin-bottom:10px;">Foto de Perfil</label>
+            <div style="margin-bottom:10px;">
+                <img id="u_foto_preview" src="" alt="Vista Previa" class="profile-avatar-large" style="display:none; margin: 0 auto;">
+            </div>
+            <input type="file" id="u_foto" accept="image/*" style="width: 100%;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="u_nombre">Nombre Completo:</label>
+            <input type="text" id="u_nombre" required style="width: 100%;" placeholder="Ej. Juan Pérez"/>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="u_rol">Rol Asignado:</label>
+            <select id="u_rol" required class="full-width-select" style="width: 100%;"></select>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="u_estado">Estado de Asignación:</label>
+            <select id="u_estado" required class="full-width-select" style="width: 100%;"></select>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ffcc80;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:#e65100; margin:0;">
+                <input type="checkbox" id="u_multiestatal" style="width:auto; margin:0;">
+                🌎 Pasaporte Multiestatal (Permitir registrar en otros estados)
+            </label>
+            <p class="small" style="margin: 5px 0 0 0; color:#666;">Al activar esto, el usuario podrá elegir cualquier estado al registrar un Círculo.</p>
+        </div>
+
+        <div id="u_municipio_container" style="display: none; margin-bottom: 15px;">
+            <label for="u_municipio">Municipio:</label>
+            <select id="u_municipio" class="full-width-select" style="width: 100%;">
+                <option value="">Selecciona un Estado primero</option>
+            </select>
+        </div>
+        
+        <div id="u_distrito_container" style="display: none; margin-bottom: 15px;">
+            <label for="u_distrito">Distrito:</label>
+            <input type="text" id="u_distrito" style="width: 100%;" placeholder="Sólo Número del Distrito"/>
+        </div>
+        
+        <div id="u_circunscripcion_container" style="display: none; margin-bottom: 15px;">
+            <label for="u_circunscripcion">Circunscripción:</label>
+            <select id="u_circunscripcion" class="full-width-select" style="width: 100%;">
+                <option value="">Selecciona Circunscripción</option>
+                <option value="1ª Circunscripción">1ª Circunscripción</option>
+                <option value="2ª Circunscripción">2ª Circunscripción</option>
+                <option value="3ª Circunscripción">3ª Circunscripción</option>
+                <option value="4ª Circunscripción">4ª Circunscripción</option>
+                <option value="5ª Circunscripción">5ª Circunscripción</option>
+            </select>
+        </div>
+        
+        <div id="u_invita_container" style="display: none; margin-bottom: 15px;">
+            <label for="u_invita">Persona que invita (Referido por):</label>
+            <input type="text" id="u_invita" placeholder="Nombre de quien invita" style="width: 100%;"/>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="u_whatsapp">WhatsApp (10 dígitos):</label>
+            <input type="tel" id="u_whatsapp" required style="width: 100%;" placeholder="Ej: 5512345678"/>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="u_usuario">Usuario (Login):</label>
+            <input type="text" id="u_usuario" required style="width: 100%;" placeholder="Nombre de usuario para entrar"/>
+        </div>
+        
+        <div style="margin-bottom: 8px;">
+            <label for="u_password">Contraseña:</label>
+            <div class="password-container">
+                <input type="password" id="u_password" required style="width:100%;"/>
+                <i class="toggle-eye" onclick="window.togglePassword('u_password', this)">👁️</i>
+            </div>
+        </div>
+        <div style="margin-bottom: 25px;">
+            <button type="button" id="btnGenerarPassword" onclick="window.generarPasswordTemporal()"
+                    style="width:100%; margin-top:6px; padding:8px; background:#1565c0; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:bold;">
+                🔑 Generar Contraseña Temporal
+            </button>
+            <div id="password-temp-display" style="display:none; margin-top:10px; background:#e8f5e9; border:2px solid #4caf50; border-radius:8px; padding:12px; text-align:center;">
+                <span style="font-size:11px; color:#555; display:block; margin-bottom:6px;">✅ Comparte esta contraseña con el usuario:</span>
+                <strong id="password-temp-text" style="font-size:20px; letter-spacing:3px; font-family:monospace; color:#1b5e20; user-select:all;"></strong>
+                <br>
+                <button type="button" onclick="window.copiarPasswordTemporal(this)"
+                        style="margin-top:8px; background:#4caf50; color:#fff; border:none; padding:5px 16px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">
+                    📋 Copiar al Portapapeles
+                </button>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+          <button type="submit" class="primary-btn" style="width: 100%; padding: 12px; font-size: 16px;">Crear Usuario</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div id="modalEditMember" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <span class="close" data-target="modalEditMember">×</span>
+        <h3>✏️ Editar Integrante</h3>
+        <p class="small" style="color:#666;">Sube una mejor foto para la credencial.</p>
+        
+        <input type="hidden" id="edit_member_circle_idx">
+        <input type="hidden" id="edit_member_idx">
+
+        <div style="margin-bottom: 15px;">
+            <img id="edit_member_preview" src="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #ff7e00; background: #eee;">
+        </div>
+
+        <label style="text-align: left;">Cambiar Foto:</label>
+        <input type="file" id="edit_member_photo_input" accept="image/*">
+
+        <label style="text-align: left; margin-top: 10px;">Corregir Nombre:</label>
+        <input type="text" id="edit_member_name_input">
+
+        <button class="primary-btn" onclick="saveMemberChanges()" style="width: 100%; margin-top: 15px;">💾 Guardar Cambios</button>
+    </div>
+  </div>
+
+  <div id="modalEventos" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large"> <span class="close" data-target="modalEventos" onclick="document.getElementById('modalEventos').style.display='none'">×</span>
+        <h3>🗓️ Gestión de Eventos</h3>
+        
+        <div class="action-grid" style="margin-bottom: 20px; justify-content: flex-start;">
+            <button class="primary-btn" onclick="showEventForm()">Crear Nuevo Evento</button>
+        </div>
+
+        <div id="calendar-view" style="margin-bottom: 20px;">
+            <h4>Calendario de Eventos</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                <button class="secondary-btn small-btn" onclick="changeMonth(-1)">◀ Mes Anterior</button>
+                <h4 id="month-year-display" style="margin: 0 15px; color: #ff7e00;"></h4>
+                <button class="secondary-btn small-btn" onclick="changeMonth(1)">Mes Siguiente ▶</button>
+            </div>
+            
+            <style> 
+                .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid #eee; }
+                .calendar-header { font-weight: bold; text-align: center; padding: 8px; background: #f4f7f6; font-size: 12px; }
+                .calendar-day { border: 1px solid #eee; min-height: 120px; padding: 5px; font-size: 12px; background: #fff; }
+                .calendar-day.other-month { background: #fcfcfc; color: #ccc; }
+                .calendar-day span { font-weight: bold; }
+                .event-marker {
+                    background: #fff3e0; border-left: 3px solid #ff7e00; padding: 4px; 
+                    margin-top: 4px; border-radius: 4px; font-size: 11px; cursor: pointer;
+                    display: flex; align-items: center; gap: 5px;
+                }
+                .event-marker:hover { background: #ffe8cc; }
+                .event-marker img { width: 20px; height: 20px; object-fit: cover; border-radius: 3px; }
+            </style>
+            
+            <div class="calendar-grid" style="margin-top: 10px;">
+                <div class="calendar-header">DOM</div>
+                <div class="calendar-header">LUN</div>
+                <div class="calendar-header">MAR</div>
+                <div class="calendar-header">MIÉ</div>
+                <div class="calendar-header">JUE</div>
+                <div class="calendar-header">VIE</div>
+                <div class="calendar-header">SÁB</div>
+            </div>
+            <div id="calendar-body" class="calendar-grid">
+                </div>
+        </div>
+
+        <div id="event-form-container" style="display: none; padding-top: 15px; border-top: 1px solid #eee;">
+            <h4 id="event-form-title" style="color: #ff7e00;">Crear Nuevo Evento</h4>
+            <form id="eventForm">
+                <input type="hidden" id="event_id" />
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label for="event_date">Fecha:</label>
+                        <input type="date" id="event_date" required />
+                    </div>
+                    <div>
+                        <label for="event_time">Hora:</label>
+                        <input type="time" id="event_time" required />
+                    </div>
+                </div>
+
+                <label for="event_title">Nombre del Evento:</label>
+                <input type="text" id="event_title" required placeholder="Ej: Asamblea Estatal de Jalisco" />
+
+                <label for="event_location">Lugar del Evento:</label>
+                <input type="text" id="event_location" required placeholder="Ej: Salón de Eventos 'La Paz'" />
+                <label for="event_map_link">Enlace de Google Maps (Opcional):</label>
+                <input type="url" id="event_map_link" placeholder="https://maps.app.goo.gl/..." />
+                
+                <label for="event_cover_image">Imagen de Portada (Opcional):</label>
+                <input type="file" id="event_cover_image" accept="image/*" class="modal-content input[type='file']" />
+                
+                <label for="event_description">Objetivo del Evento / Descripción:</label>
+                <textarea id="event_description" rows="3" placeholder="Detalles, agenda, etc."></textarea>
+                
+                <h4 style="margin-top: 15px;">👤 Lista de Invitados Específicos</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <button type="button" class="secondary-btn" id="btnPickInvites" onclick="openModal('modalSelectInvites'); handleSelectInvitesModal();">👤 Seleccionar Invitados</button>
+                    <p style="margin: 0;">Invitados Seleccionados: <strong id="event_invite_count">0</strong></p>
+                </div>
+                <input type="hidden" id="event_invited_users" value="">
+                
+                <label style="margin-top: 15px;">O invitar a Círculos Ciudadanos (filtrar por Causa):</label>
+                <div id="event_cause_filters" class="options-grid" style="font-size: 12px;">
+                    </div>
+
+                <div id="event-guest-manager" style="display: none; margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 20px;">
+                    <h4 style="color: #e65100;">📨 Envío de Invitaciones</h4>
+                    <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 13px;">
+                        <strong>Mensaje Automático:</strong><br>
+                        <em id="event-preview-msg" style="color: #555;">(Guarda el evento para generar la vista previa)</em>
+                    </div>
+                    <div class="action-grid" style="margin-bottom: 10px;">
+                          <div style="display:flex; gap:10px; align-items:center;">
+                             <span class="small">Filtrar lista:</span>
+                             <button type="button" class="secondary-btn small-btn" onclick="filterEventGuestList('all')">Todos</button>
+                             <button type="button" class="secondary-btn small-btn" onclick="filterEventGuestList('pending')">Pendientes de Envío</button>
+                          </div>
+                    </div>
+                    
+                    <button class="secondary-btn" onclick="window.abrirEscanerQR(document.getElementById('event_id').value)" style="background:#333; color:#fff; width:100%; margin-bottom:10px;">📸 Escanear Asistencia (QR)</button>
+
+                    <div style="max-height: 300px; overflow-y: auto; border: 1px solid #eee;">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Invitado</th>
+                                    <th>Rol / Estado</th>
+                                    <th>WhatsApp</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventGuestListTbody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <button class="primary-btn" type="submit" style="margin-top: 15px;">Guardar Evento</button>
+                <button class="secondary-btn" type="button" onclick="document.getElementById('event-form-container').style.display='none'">Cancelar</button>
+                <button class="secondary-btn small-btn delete-btn" type="button" id="btnDeleteEvent" style="display:none; float:right; margin-top: 15px;" onclick="deleteEvent()">Eliminar Evento</button>
+            </form>
+        </div>
+    </div>
+  </div>
+
+  <div id="modalUserInvitation" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalUserInvitation').style.display='none'">×</span>
+        <h3 id="invitation-title">Invitación a Evento</h3>
+        <p><strong>Fecha y Hora:</strong> <span id="invitation-datetime"></span></p>
+        <p><strong>Lugar:</strong> <span id="invitation-location"></span></p>
+        <p><strong>Descripción:</strong> <span id="invitation-description"></span></p>
+        
+        <p id="invitation-status-message">Confirma tu asistencia:</p>
+        <button class="primary-btn" id="btnConfirmAttendance">✅ Confirmar Asistencia</button>
+        <button class="secondary-btn" id="btnDeclineAttendance">❌ Rechazar Invitación</button>
+    </div>
+  </div>
+
+  <div id="modalSelectInvites" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large">
+        <span class="close" data-target="modalSelectInvites" onclick="closeModal('modalSelectInvites')">×</span>
+        <h3>👤 Seleccionar Invitados por Perfil</h3>
+        <p class="small">Selecciona los perfiles que recibirán la invitación a este evento. Solo los usuarios seleccionados podrán confirmar su asistencia. (Los Secretarios Estatales solo ven usuarios de su estado).</p>
+        
+        <div class="filters" style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+            <div>
+                <label for="invite_filter_name" class="small" style="margin-top:0;">Buscar por Nombre:</label>
+                <input type="text" id="invite_filter_name" onkeyup="applyInviteFilters()" style="margin:0; padding: 8px;">
+            </div>
+            <div>
+                <label for="invite_filter_state" class="small" style="margin-top:0;">Filtrar por Estado:</label>
+                <select id="invite_filter_state" onchange="applyInviteFilters()" style="margin:0; padding: 8px;"></select>
+            </div>
+            <div>
+                <label for="invite_filter_role" class="small" style="margin-top:0;">Filtrar por Rol:</label>
+                <select id="invite_filter_role" onchange="applyInviteFilters()" style="margin:0; padding: 8px;"></select>
+            </div>
+        </div>
+        <div style="max-height: 500px; overflow-y: auto;">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Invitar</th>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="inviteUserListTbody">
+                    <tr><td colspan="4" style="text-align: center;">Cargando usuarios...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+            <button class="primary-btn" onclick="handleSaveInvitedUsers()">✅ Guardar Invitados</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="modalMemberList" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large">
+        <span class="close" data-target="modalMemberList" onclick="closeModal('modalMemberList')">×</span>
+        <h3>👥 Directorio Global de Integrantes y Mensajería</h3>
+
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffcc80;">
+            <h4 style="margin-top: 0; color: #e65100;">📢 Centro de Comunicados (WhatsApp Masivo)</h4>
+            
+            <div style="margin-bottom: 10px;">
+                <label for="msgTemplate" class="small" style="font-weight:bold;">Usar Plantilla Predefinida:</label>
+                <select id="msgTemplate" class="full-width-select" onchange="applyMessageTemplate()">
+                    <option value="">-- Seleccionar Plantilla --</option>
+                    <option value="bienvenida">👋 Bienvenida al Círculo</option>
+                    <option value="asamblea">🗓️ Recordatorio de Asamblea</option>
+                    <option value="noticia">📰 Noticia Importante</option>
+                    <option value="validacion">✅ Solicitud de Validación</option>
+                </select>
+            </div>
+
+            <textarea id="bulkMessageText" rows="3" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Escribe aquí tu mensaje... (El saludo 'Hola Nombre' se agrega automático)"></textarea>
+            
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                    <label for="mediaLink" class="small" style="margin:0;">📎 Enlace a Imagen/PDF/Video (Opcional):</label>
+                    <input type="url" id="mediaLink" placeholder="Ej: https://bit.ly/invitacion-pdf" style="width: 100%; margin:0; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+                <button class="primary-btn" onclick="generateBulkWhatsappLinks()" style="padding: 10px 20px; font-size: 14px;">
+                    🚀 Preparar Envíos
+                </button>
+            </div>
+            
+            <p class="small" style="margin-bottom: 0; color: #666; margin-top: 10px;">
+                <strong>Nota:</strong> WhatsApp Web no permite adjuntar archivos automáticamente. Para compartir una imagen, sube tu archivo a Google Drive, Imgur o tu sitio web y pega el enlace arriba.
+            </p>
+        </div>
+
+        <div class="filters" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+            <input type="text" id="memberSearchInput" placeholder="Buscar por nombre..." onkeyup="filterGlobalMemberList()" style="margin:0; max-width: 200px;">
+            <select id="memberStateFilter" onchange="filterGlobalMemberList()" style="margin:0; max-width: 200px;"></select>
+            
+            <label style="display:flex; align-items:center; gap:5px; margin:0;">
+                <input type="checkbox" id="memberFilterCoordinator" onchange="filterGlobalMemberList()">
+                <span class="small">Ver solo Coordinadores de Círculo</span>
+            </label>
+
+            <button class="secondary-btn small-btn" onclick="window.downloadAllCredentialsPDF()" style="background: #673ab7; color: white; margin-left: 10px;">🪪 PDF Masivo</button>
+
+            <span class="small" style="margin-left: auto;">Total visibles: <strong id="memberVisibleCount">0</strong></span>
+        </div>
+
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30px; text-align: center;"><input type="checkbox" id="selectAllMembers" onchange="toggleSelectAllMembers()"></th>
+                        <th>Nombre del Integrante</th>
+                        <th>Círculo Ciudadano</th>
+                        <th>Estado/Municipio</th>
+                        <th>Teléfono</th>
+                        <th>Acción / Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="memberListTbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+
+  <div id="modalScanner" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
+        <span class="close" onclick="cerrarEscaner()">×</span>
+        <h3 style="color: #ff7e00;">📸 Escáner Validador</h3>
+        <p class="small">Apunta la cámara al código QR de la credencial</p>
+        
+        <div id="reader" style="width: 100%; min-height: 300px; background: #000;"></div>
+        
+        <div id="scanResult" style="margin-top: 15px; padding: 10px; display: none;">
+            </div>
+
+        <button onclick="cerrarEscaner()" class="btn-secondary" style="margin-top: 10px;">Cerrar Cámara</button>
+    </div>
+  </div>
+
+  <div id="modalValidacion" class="modal">
+    <div class="modal-content modal-content-large" style="max-width: 800px;">
+        <span class="close" onclick="cerrarModalValidacion()">×</span>
+        
+        <h2 style="color: #ff7e00; border-bottom: 2px solid #ff7e00; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>👮 Mesa de Auditoría y Validación</span>
+        </h2>
+
+        <div id="validacion-info-area" style="margin-bottom: 20px; max-height: 350px; overflow-y: auto; background: #f4f7f6; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+            <p>Cargando expediente...</p>
+        </div>
+
+        <hr style="border-top: 1px solid #ccc;">
+
+        <h3 style="margin-top: 10px; color: #333;">Dictamen Final:</h3>
+        
+        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <button onclick="confirmarAprobacion()" class="btn-primary" style="background-color: #28a745; border: none; flex: 1; padding: 12px; font-size: 16px;">
+                ✅ APROBAR CÍRCULO
+            </button>
+            <button onclick="mostrarAreaRechazo()" class="btn-primary" style="background-color: #dc3545; border: none; flex: 1; padding: 12px; font-size: 16px;">
+                ❌ RECHAZAR / OBSERVAR
+            </button>
+        </div>
+
+        <div id="area-rechazo" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
+            <h4 style="color: #856404; margin-top: 0; margin-bottom: 10px;">Causas de Rechazo (Selecciona las aplicables):</h4>
+            
+            <div class="options-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; font-size: 13px;">
+                <label><input type="checkbox" class="rechazo-cb" value="No se seleccionó coordinador(a) del círculo."> 1. Falta designar Coordinador(a)</label>
+                <label><input type="checkbox" class="rechazo-cb" value="El INE no es legible."> 2. INE ilegible</label>
+                <label><input type="checkbox" class="rechazo-cb" value="El formato del archivo no es el requerido o el INE no es de frente."> 3. Formato de INE incorrecto</label>
+                <label><input type="checkbox" class="rechazo-cb" value="Ningún integrante del círculo respondió la llamada."> 4. Nadie respondió la llamada</label>
+                <label><input type="checkbox" class="rechazo-cb" value="El teléfono de un integrante no existe."> 5. Teléfono inexistente</label>
+                <label><input type="checkbox" class="rechazo-cb" value="Un integrante manifestó negación en pertenecer al círculo."> 6. Integrante niega pertenencia</label>
+                <label><input type="checkbox" class="rechazo-cb" value="Un integrante no reconoció su firma, ni haber firmado el acta."> 7. Firma no reconocida / Falsa</label>
+                <label><input type="checkbox" class="rechazo-cb" value="Un integrante desconoce la causa o causas del círculo."> 8. Desconocen la causa del Círculo</label>
+            </div>
+
+            <input type="hidden" id="motivoRechazo"> 
+
+            <label for="motivoRechazoExtra" style="font-size: 13px;"><strong>Notas adicionales (Opcional):</strong></label>
+            <textarea id="motivoRechazoExtra" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Detalla aquí si hay alguna otra observación..."></textarea>
+            
+            <button onclick="procesarRechazoAvanzado()" class="btn-primary" style="margin-top: 15px; background-color: #ff7e00; width: 100%; padding: 12px; font-size: 15px;">
+                📩 ENVIAR OBSERVACIONES AL COORDINADOR
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <div id="modalCentroMando" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large" style="border-top: 5px solid #333;">
+        <span class="close" onclick="closeModal('modalCentroMando')">×</span>
+        
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <div style="font-size: 30px;">🛡️</div>
+            <div>
+                <h2 style="margin: 0; color: #333;">Centro de Mando Ciudadano</h2>
+                <p class="small" style="margin: 0; color: #666;">Consola de Configuración de Estructura Nacional</p>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- ═══ PANEL DE CONTROL DE USUARIOS v15.24 ═══ -->
+        <section style="margin-bottom: 30px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h4 style="margin:0;color:#1a237e;">&#x1F9D1;&#x200D;&#x1F4BB; Panel de Control de Usuarios</h4>
+                <button onclick="window.renderUserControlPanel()"
+                    style="background:#1a237e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">
+                    &#x1F504; Actualizar
+                </button>
+            </div>
+            <div id="user-control-content" style="background:#fafafa;border:1px solid #e8eaf6;border-radius:8px;padding:16px;min-height:80px;">
+                <p style="text-align:center;color:#aaa;font-size:13px;padding:20px 0;">Presiona <strong>Actualizar</strong> para cargar el panel de control.</p>
+            </div>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- ═══ MODO MANTENIMIENTO v15.26 ═══ -->
+        <section style="margin-bottom: 30px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h4 style="margin:0;color:#b71c1c;">&#x1F6E0;&#xFE0F; Modo Mantenimiento</h4>
+                <button onclick="window.renderMaintenancePanel()"
+                    style="background:#b71c1c;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">
+                    &#x1F504; Actualizar
+                </button>
+            </div>
+            <p class="small" style="margin:0 0 10px 0;color:#555;">
+                Activa un <strong>Banner informativo</strong> (los usuarios pueden seguir trabajando) o un <strong>Bloqueo total</strong> (solo administradores pueden entrar al sistema). Perfecto para despliegues y cambios en el servidor.
+            </p>
+            <div id="maintenance-panel-content" style="background:#fff8f8;border:1px solid #ffcdd2;border-radius:8px;padding:16px;min-height:80px;">
+                <p style="text-align:center;color:#aaa;font-size:13px;padding:20px 0;">Presiona <strong>Actualizar</strong> para ver el estado del sistema.</p>
+            </div>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 10px 0; color: #e65100;">🛠️ Constructor de Estructura (Roles Dinámicos)</h4>
+            <p class="small" style="margin-bottom: 15px;">Crea nuevos cargos. Aparecerán automáticamente en el Dashboard y en las opciones de registro de usuarios.</p>
+
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                <form id="formNewRole" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    
+                    <div style="grid-column: span 2;">
+                        <label>Nombre del Cargo (Plural):</label>
+                        <input type="text" id="new_role_label" placeholder="Ej: Activistas Digitales" required>
+                    </div>
+
+                    <div>
+                        <label>ID del Rol (Sistema):</label>
+                        <input type="text" id="new_role_value" placeholder="Ej: activista_digital" required>
+                        <p class="small">Sin espacios ni acentos (usar _)</p>
+                    </div>
+
+                    <div>
+                        <label>Icono (Emoji):</label>
+                        <input type="text" id="new_role_icon" placeholder="Ej: 📱" value="👤">
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label>¿Quién puede registrar este cargo?</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;">
+                            <label style="font-weight: normal; font-size: 12px;">
+                                <input type="checkbox" class="role-perm-check" value="secretario_nacional" checked disabled> Sec. Nacional
+                            </label>
+                            <label style="font-weight: normal; font-size: 12px;">
+                                <input type="checkbox" class="role-perm-check" value="titular_nacional" checked> Titulares Nacionales
+                            </label>
+                            <label style="font-weight: normal; font-size: 12px;">
+                                <input type="checkbox" class="role-perm-check" value="secretario_estatal" checked> Sec. Estatales
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="primary-btn" style="grid-column: span 2; margin-top: 10px;">➕ Crear Nuevo Rol y Tarjeta</button>
+                </form>
+            </div>
+
+            <h5 style="margin-top: 30px; border-bottom: 2px solid #ff7e00; padding-bottom: 5px;">⚙️ Gestión de Tarjetas del Dashboard:</h5>
+            <p class="small">Oculta o renombra las tarjetas del sistema. Borra definitivamente los roles que creaste por error.</p>
+            <div id="customRolesList" style="max-height: 350px; overflow-y: auto; background: #fff; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 10px 0; color: #d32f2f;">🚦 Semáforo de Carga (Control de Tráfico)</h4>
+            <p class="small" style="margin-bottom: 15px;">Define quién puede registrar círculos por día de la semana para no saturar el servidor.</p>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                <label style="font-weight:bold;">Día a Configurar:</label>
+                <select id="trafficDaySelect" onchange="window.loadTrafficRules()" style="padding: 8px; border-radius: 5px;">
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miércoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                    <option value="6">Sábado</option>
+                    <option value="0">Domingo</option>
+                </select>
+                <span class="small" style="color:#666;">(Selecciona un día para editar sus permisos)</span>
+            </div>
+
+            <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+                
+                <h5 style="margin-top:0;">🌎 1. Autorizar por Estado / Circunscripción</h5>
+                <div style="margin-bottom: 10px;">
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficRegion(1)">Circ. 1</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficRegion(2)">Circ. 2</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficRegion(3)">Circ. 3</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficRegion(4)">Circ. 4</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficRegion(5)">Circ. 5</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficAllStates(true)" style="background:#e8f5e9;">✅ Todos</button>
+                    <button type="button" class="secondary-btn small-btn" onclick="toggleTrafficAllStates(false)" style="background:#ffebee;">🚫 Ninguno</button>
+                </div>
+                
+                <div id="trafficStateChecks" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 5px; max-height: 150px; overflow-y: auto; border:1px solid #eee; padding:5px; margin-bottom: 15px;">
+                    </div>
+
+                <h5>⭐ 2. Autorizar Roles Especiales (Sin importar Estado)</h5>
+                <div class="options-grid" id="trafficRoleChecks">
+                    <label><input type="checkbox" value="diputado_federal"> Dip. Federales</label>
+                    <label><input type="checkbox" value="diputado_local"> Dip. Locales</label>
+                    <label><input type="checkbox" value="senador"> Senadores</label>
+                    <label><input type="checkbox" value="invitado_especial"> Invitados Especiales</label>
+                    <label><input type="checkbox" value="secretario_nacional"> Sec. Nacional (Admin)</label>
+                </div>
+
+                <button class="primary-btn" onclick="window.saveTrafficRules()" style="width:100%; margin-top:10px;">💾 Guardar Reglas para este Día</button>
+            </div>
+        </section>
+
+        <section>
+            <h4 style="color: #e65100; margin-bottom: 10px;">🔑 Matriz de Permisos y Poder</h4>
+            <div style="max-height: 350px; overflow-y: auto; border: 1px solid #eee;">
+                <table class="report-table" id="tablaPermisosAdmin">
+                    <thead style="position: sticky; top: 0; background: #f4f7f6; font-size: 11px;">
+                        <tr>
+                            <th>Rol</th>
+                            <th style="text-align:center;">➕ Crear</th>
+                            <th style="text-align:center;">✏️ Editar</th>
+                            <th style="text-align:center;">🗑️ Borrar</th>
+                            <th style="text-align:center;">👥 Ver Todo</th>
+                            <th style="text-align:center;">📊 Rep. Estatal</th>
+                            <th style="text-align:center;">📋 Rep. Circ.</th>
+                            <th style="text-align:center;">⚙️ C. Mando</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyPermisos">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <section id="seccionSolicitudesAdmin" style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 12px 0; color: #7b1fa2;">
+                &#x1F4CB; Solicitudes Pendientes
+                <span id="badgeSolicitudesTotal" style="display:none; background:#d32f2f; color:#fff; font-size:11px; padding:2px 8px; border-radius:10px; margin-left:8px; vertical-align:middle;">0</span>
+            </h4>
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                <button id="tabBtnSolicitud_rol" onclick="window.switchSolicitudTab('rol')" style="padding:7px 14px; border-radius:20px; border:1px solid #7b1fa2; cursor:pointer; font-size:12px; font-weight:bold; background:#7b1fa2; color:#fff;">
+                    &#x1F501; Cambio de Rol
+                    <span id="badgeSolicitudesRol" style="display:none; background:#fff; color:#7b1fa2; font-size:10px; padding:1px 6px; border-radius:8px; margin-left:4px;">0</span>
+                </button>
+                <button id="tabBtnSolicitud_borrado" onclick="window.switchSolicitudTab('borrado')" style="padding:7px 14px; border-radius:20px; border:1px solid #ccc; cursor:pointer; font-size:12px; font-weight:bold; background:#fff; color:#555;">
+                    &#x1F5D1;&#xFE0F; Solicitudes de Borrado
+                    <span id="badgeSolicitudesBorrado" style="display:none; background:#d32f2f; color:#fff; font-size:10px; padding:1px 6px; border-radius:8px; margin-left:4px;">0</span>
+                </button>
+            </div>
+            <div id="tabSolicitudes_rol">
+                <p class="small" style="margin:0 0 10px 0; color:#555;">Usuarios que solicitan un cambio de cargo. Si se aprueba, el ROL se actualiza de inmediato.</p>
+                <div id="listaSolicitudesRol" style="background:#fff; border:1px solid #ddd; border-radius:8px; max-height:300px; overflow-y:auto;">
+                    <p class="small" style="text-align:center; color:#aaa; padding:20px;">Cargando...</p>
+                </div>
+            </div>
+            <div id="tabSolicitudes_borrado" style="display:none;">
+                <p class="small" style="margin:0 0 10px 0; color:#555;">Secretarios que solicitan eliminar un usuario o c&#237;rculo. Si se aprueba, el borrado es permanente e irreversible.</p>
+                <div id="listaSolicitudesBorrado" style="background:#fff; border:1px solid #ddd; border-radius:8px; max-height:300px; overflow-y:auto;">
+                    <p class="small" style="text-align:center; color:#aaa; padding:20px;">Cargando...</p>
+                </div>
+            </div>
+        </section>
+
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 10px 0; color: #1b5e20;">&#x1F52D; Observatorio Ciudadano</h4>
+            <p class="small" style="margin-bottom: 15px; color:#555;">Vista consolidada de coordinadores por municipio. Herramienta de convocatoria para sesiones del Observatorio (Art. 17 del Reglamento CC).</p>
+            <button class="primary-btn" onclick="closeModal('modalCentroMando'); window.abrirObservatorio();" style="background:#1b5e20; color:#fff; width:100%;">&#x1F52D; Abrir Observatorio Ciudadano</button>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- Importación Masiva -->
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 6px 0; color: #2e7d32;">&#x1F4E5; Importaci&oacute;n Masiva de Usuarios</h4>
+            <p class="small" style="margin-bottom: 12px; color:#555;">Crea m&uacute;ltiples usuarios desde un archivo Excel o CSV. Descarga la plantilla, ll&eacute;nala y s&uacute;bela para revisar y confirmar antes de importar. Las contrase&ntilde;as temporales se generan autom&aacute;ticamente.</p>
+            <button class="primary-btn" onclick="window.openModal('modalImportUsuarios')" style="background:#2e7d32; color:#fff; width:100%;">&#x1F4E5; Abrir Importador de Usuarios</button>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- Ordenar Delegados -->
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 6px 0; color: #37474f;">&#x1F5C2;&#xFE0F; Ordenar Delegados Estatales</h4>
+            <p class="small" style="margin-bottom: 12px; color:#555;">Detecta y corrige duplicados de delegados estatales. M&aacute;ximo 1 delegado estatal por rol por estado. Los excedentes se pueden reclasificar a su equivalente municipal con un clic.</p>
+            <button class="primary-btn" onclick="window.renderOrdenarDelegados()" style="background:#37474f; color:#fff; margin-bottom:14px;">&#x1F504; Analizar estructura de delegados</button>
+            <div id="ordenar-delegados-content" style="max-height:400px; overflow-y:auto; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
+                <p style="text-align:center; color:#aaa; padding:20px; font-size:13px;">Presiona el botón para analizar.</p>
+            </div>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- ═══ RESCATE DE CÍRCULOS v15.25 ═══ -->
+        <section style="margin-bottom: 30px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h4 style="margin:0;color:#b71c1c;">&#x1F691; Rescate de C&iacute;rculos</h4>
+                <button onclick="window.renderRescateCirculos()"
+                    style="background:#b71c1c;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">
+                    &#x1F50D; Analizar BD
+                </button>
+            </div>
+            <p class="small" style="margin:0 0 10px 0;color:#555;">
+                Detecta c&iacute;rculos <strong>en Limbo</strong> (sin estado), <strong>Hu&eacute;rfanos</strong> (sin due&ntilde;o v&aacute;lido) y <strong>Desplazados</strong> (estado del c&iacute;rculo ≠ estado del coordinador). Permite reasignar coordinador y/o estado en un clic.
+            </p>
+            <div id="rescate-circulos-content" style="background:#fafafa;border:1px solid #ffcdd2;border-radius:8px;padding:16px;min-height:60px;">
+                <p style="text-align:center;color:#aaa;font-size:13px;padding:10px 0;">Presiona <strong>Analizar BD</strong> para escanear los c&iacute;rculos.</p>
+            </div>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- Bitácora del Sistema -->
+        <section style="margin-bottom: 30px;">
+            <h4 style="margin: 0 0 6px 0; color: #263238;">&#x1F575;&#xFE0F; Bit&aacute;cora del Sistema</h4>
+            <p class="small" style="margin-bottom: 12px; color:#555;">Registro cronol&oacute;gico de todas las acciones realizadas: inicios de sesi&oacute;n, creaci&oacute;n/edici&oacute;n/eliminaci&oacute;n de usuarios y c&iacute;rculos. Solo visible para Admin y Secretario Nacional.</p>
+            <button class="primary-btn" onclick="window.renderBitacora()" style="background:#263238; color:#fff; margin-bottom:14px;">&#x1F504; Cargar Bit&aacute;cora</button>
+            <div id="bitacora-content" style="max-height:420px; overflow-y:auto; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
+                <p style="text-align:center; color:#aaa; padding:20px; font-size:13px;">Presiona el bot&oacute;n para cargar los registros.</p>
+            </div>
+        </section>
+
+        <div style="margin-top: 25px; text-align: right; background: #eee; padding: 15px; border-radius: 8px;">
+            <button class="secondary-btn" onclick="closeModal('modalCentroMando')">Cerrar Consola de Seguridad</button>
+            <a href="admin_compress_ine.php" target="_self" class="secondary-btn" style="margin-left:10px; background:#4a148c; color:#fff; text-decoration:none; display:inline-block;">&#x1F5DC;&#xFE0F; Compresor de Im&aacute;genes INE</a>
+        </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════ MODAL IMPORTACIÓN MASIVA DE USUARIOS ═══════════ -->
+  <div id="modalImportUsuarios" class="modal" style="display:none;">
+    <div class="modal-content modal-content-large" style="border-top:5px solid #2e7d32; max-width:920px;">
+        <span class="close" onclick="closeModal('modalImportUsuarios')">×</span>
+
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+            <div style="font-size:32px;">📥</div>
+            <div>
+                <h2 style="margin:0; color:#2e7d32;">Importaci&oacute;n Masiva de Usuarios</h2>
+                <p class="small" style="margin:0; color:#666;">Crea m&uacute;ltiples usuarios desde Excel o CSV con revisi&oacute;n antes de importar.</p>
+            </div>
+        </div>
+
+        <!-- Paso 1: Plantilla -->
+        <div style="background:#f1f8e9; border:1px solid #c5e1a5; border-radius:8px; padding:14px; margin-bottom:18px;">
+            <p style="margin:0 0 8px 0; font-weight:bold; color:#33691e; font-size:14px;">&#x1F4CB; Paso 1 &mdash; Descarga la plantilla Excel</p>
+            <p class="small" style="margin:0 0 10px 0; color:#555;">
+                Columnas <strong>obligatorias</strong>: <code>usuario</code>, <code>nombre</code>, <code>rol</code>, <code>estado</code>.
+                &nbsp;Opcionales: <code>municipio</code>, <code>email</code>, <code>telefono</code>.<br>
+                El archivo incluye dos hojas de referencia: catálogo de roles y de estados.
+            </p>
+            <button onclick="window.descargarPlantillaImport()"
+                style="padding:8px 18px; background:#33691e; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
+                &#x1F4E5; Descargar Plantilla (.xlsx)
+            </button>
+        </div>
+
+        <!-- Paso 2: Subir archivo -->
+        <div style="margin-bottom:18px;">
+            <p style="font-weight:bold; color:#333; margin:0 0 8px 0; font-size:14px;">&#x1F4C2; Paso 2 &mdash; Sube tu archivo Excel o CSV</p>
+            <label for="import-file-input"
+                style="display:block; border:2px dashed #90a4ae; border-radius:8px; padding:16px;
+                       background:#fafafa; text-align:center; cursor:pointer; color:#546e7a; font-size:13px;">
+                <strong>Haz clic aqu&iacute; o arrastra el archivo</strong><br>
+                <span style="font-size:11px; color:#90a4ae;">Formatos aceptados: .xlsx, .xls, .csv</span>
+                <input type="file" id="import-file-input" accept=".xlsx,.xls,.csv"
+                    onchange="window.procesarArchivoImport(this)"
+                    style="display:none;">
+            </label>
+        </div>
+
+        <!-- Paso 3: Vista previa y resultados -->
+        <div id="import-preview-area" style="min-height:60px;">
+            <p style="color:#aaa; text-align:center; font-size:13px; padding:20px;">
+                Carga un archivo para ver la vista previa y validaci&oacute;n.
+            </p>
+        </div>
+    </div>
+  </div>
+
+  <div id="modalAddArea" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 400px;">
+        <span class="close" onclick="closeModal('modalAddArea')">×</span>
+        <h3 style="text-align: center; color: #ff7e00;">🚀 Nueva Área Estratégica</h3>
+        <p class="small" style="text-align: center;">Define un nuevo sector para la meta 2027.</p>
+        
+        <form id="formNewArea">
+            <label for="newAreaName">Nombre del Movimiento/Área:</label>
+            <input type="text" id="newAreaName" placeholder="Ej: Diversidad, Medio Ambiente..." required />
+            
+            <label for="newAreaIcon">Icono (Emoji):</label>
+            <input type="text" id="newAreaIcon" placeholder="Ej: 🌈, 🌿, 🎓" required />
+            
+            <label for="newAreaRole">ID del Rol (Sistema):</label>
+            <input type="text" id="newAreaRole" placeholder="Ej: titular_nacional_diversidad" required />
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="primary-btn" style="width: 100%;">💾 Crear Área y Dashboard</button>
+            </div>
+        </form>
+    </div>
+  </div>
+
+  <div id="modalProfile" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 450px;">
+        <span class="close" onclick="closeModal('modalProfile')">×</span>
+        <h3 style="text-align: center; color: #ff7e00;">✏️ Editar Mi Perfil</h3>
+        
+        <form id="formProfile">
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="margin-bottom:10px;">
+                    <img id="profile_preview" src="img/default-avatar.png" class="profile-avatar-large" style="display:block; margin: 0 auto; border: 4px solid #ff7e00;">
+                </div>
+                <label for="profile_foto" class="secondary-btn small-btn" style="cursor:pointer; display:inline-block;">📷 Cambiar Foto</label>
+                <input type="file" id="profile_foto" accept="image/*" style="display:none;" onchange="previewProfileImage(this)">
+            </div>
+
+            <div class="form-field">
+                <label>Nombre Completo:</label>
+                <input type="text" id="profile_nombre" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-field">
+                    <label>Usuario (Login):</label>
+                    <input type="text" id="profile_usuario" readonly style="background:#f0f0f0; color:#666;">
+                </div>
+                <div class="form-field">
+                    <label>Rol / Cargo:</label>
+                    <input type="text" id="profile_rol" readonly style="background:#f0f0f0; color:#666;">
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label>WhatsApp:</label>
+                <input type="tel" id="profile_whatsapp">
+            </div>
+
+            <div class="form-field">
+                <label>Nueva Contraseña (Opcional):</label>
+                <div class="password-container">
+                    <input type="password" id="profile_password" placeholder="Dejar vacío para no cambiar">
+                    <i class="toggle-eye" onclick="togglePassword('profile_password', this)">👁️</i>
+                </div>
+            </div>
+
+            <button type="submit" class="primary-btn" style="width:100%; margin-top:15px;">💾 Guardar Cambios</button>
+        </form>
+
+        <div style="margin-top:12px; text-align:center; border-top:1px solid #eee; padding-top:12px;">
+            <p class="small" style="color:#888; margin:0 0 8px 0;">&iquest;Necesitas un ROL diferente? Tu administrador debe autorizarlo.</p>
+            <button id="btnSolicitarRol" class="secondary-btn small-btn" onclick="closeModal('modalProfile'); openRoleRequestModal();" style="display:none;">&#x1F504; Solicitar cambio de ROL</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Modal Solicitar Cambio de ROL -->
+  <div id="modalSolicitarRol" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 460px;">
+        <span class="close" onclick="closeModal('modalSolicitarRol')">&#215;</span>
+        <h3 style="text-align:center; color:#7b1fa2;">&#x1F511; Solicitar Cambio de ROL</h3>
+        <p class="small" style="text-align:center; color:#555; margin-bottom:20px;">Tu solicitud sera revisada por el administrador. No podras cambiar tu ROL directamente.</p>
+
+        <form id="formSolicitarRol" onsubmit="submitRoleRequest(event)">
+            <div class="form-field">
+                <label>ROL Actual:</label>
+                <input type="text" id="rolRequest_actual" readonly style="background:#f0f0f0; color:#666; font-weight:bold;">
+            </div>
+
+            <div class="form-field">
+                <label>ROL que deseas solicitar:</label>
+                <select id="rolRequest_solicitado" required class="full-width-select" style="width:100%;"></select>
+            </div>
+
+            <div class="form-field">
+                <label>Motivo de la solicitud:</label>
+                <textarea id="rolRequest_motivo" rows="3" placeholder="Explica brevemente por que necesitas este cambio de ROL..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:5px; font-size:13px;" required></textarea>
+            </div>
+
+            <p id="rolRequest_error" style="color:#d32f2f; font-size:12px; text-align:center; min-height:16px;"></p>
+            <p id="rolRequest_ok"    style="color:#2e7d32; font-size:12px; text-align:center; min-height:16px;"></p>
+
+            <button type="submit" class="primary-btn" style="width:100%; margin-top:10px;">Enviar Solicitud</button>
+            <button type="button" class="secondary-btn" onclick="closeModal('modalSolicitarRol')" style="width:100%; margin-top:8px;">Cancelar</button>
+        </form>
+    </div>
+  </div>
+  <!-- Modal iOS-safe para subir foto a credencial -->
+  <div id="modalCredPhoto" class="modal" style="display:none;">
+      <div class="modal-content" style="max-width:380px; text-align:center;">
+          <span class="close" data-target="modalCredPhoto">×</span>
+          <h3>📷 Foto de Perfil</h3>
+          <p class="small" style="color:#555; margin-bottom:15px;">Este integrante no tiene foto. ¿Deseas agregar una antes de generar la credencial?</p>
+          <input type="file" id="credPhotoFileInput" accept="image/*" capture="user" style="display:none;">
+          <label for="credPhotoFileInput" class="primary-btn" style="display:inline-block; cursor:pointer; margin-bottom:10px; width:80%;">📁 Seleccionar Foto</label>
+          <br>
+          <button class="secondary-btn" id="btnCredSkipPhoto" style="width:80%; margin-top:5px;">⚡ Generar sin Foto</button>
+      </div>
+  </div>
+
+  <div id="credential-container" style="position: fixed; left: -9999px; top: 0;">
+    <div id="credential-card" class="credencial-box">
+        <div class="credencial-bg"></div>
+        <div class="credencial-watermark"></div>
+        <div class="credencial-header">
+            <img src="img/mc.jpeg" alt="MC" class="logo-mc-cred">
+            <div class="header-text">
+                <h2>MOVIMIENTO CIUDADANO</h2>
+                <h3>CÍRCULOS CIUDADANOS</h3>
+            </div>
+        </div>
+        <div class="credencial-body">
+            <div class="photo-area"><img id="cred-photo" src="img/default-avatar.png"></div>
+            <div class="info-area">
+                <h1 id="cred-name">NOMBRE</h1>
+                <p class="label">CARGO / ROL</p><h4 id="cred-role">INTEGRANTE</h4>
+                <div id="cred-coordinador-banner" style="display:none; background:#ff7e00; color:#fff; padding:4px 10px; border-radius:4px; font-size:11px; font-weight:bold; text-align:center; margin:4px 0; letter-spacing:1px;">&#11088; COORDINADOR DE C&#205;RCULO CIUDADANO</div>
+                <div class="grid-info">
+                    <div><p class="label">ESTADO</p><span id="cred-state">...</span></div>
+                    <div><p class="label">MUNICIPIO</p><span id="cred-mun">...</span></div>
+                </div>
+                <div class="circle-name-box">
+                    <p class="label">PERTENECE AL CÍRCULO:</p><strong id="cred-circle">...</strong>
+                </div>
+            </div>
+        </div>
+        <div class="credencial-footer">
+            <div class="qr-box" id="cred-qr"></div>
+            <div class="footer-text">
+                <p>MIE - <span id="cred-date">2026</span></p>
+                <p class="small-id">ID: <span id="cred-id">...</span></p>
+            </div>
+            <img src="img/circulos.jpg" alt="Logo" class="logo-circulos-cred">
+        </div>
+    </div>
+  </div>
+
+  <div id="modalRadar" class="modal" style="display:none;">
+      <div class="modal-content" style="max-width: 400px;">
+          <span class="close" onclick="closeModal('modalRadar')">×</span>
+          <div id="radar-content">
+              </div>
+      </div>
+  </div>
+
+  <div style="display:none;">
+    <img id="logoMC" src="img/mc.jpeg" alt="Logo MC" crossorigin="anonymous">
+    <img id="logoCirculos" src="img/circulos.jpg" alt="Logo Círculos" crossorigin="anonymous">
+  </div>
+
+  <script src="js/config.js?v=15.29"></script>
+  <script src="js/utils.js?v=15.29"></script>
+
+  <script src="js/ocr-engine.js?v=15.29"></script>
+  <script src="js/pdf-engine.js?v=15.29"></script>
+
+  <script src="js/api-service.js?v=15.29"></script>
+  <script src="js/auth.js?v=15.29"></script>
+  
+  <script src="js/municipios.js?v=15.29"></script>
+  
+  <script src="js/circles-manager.js?v=15.29"></script>
+  <script src="js/admin-manager.js?v=15.29"></script>
+  <script src="js/events-manager.js?v=15.29"></script>
+
+  <script src="js/main.js?v=15.29"></script>
+
+  <script>
+    // RUTINA DE LIMPIEZA PROFUNDA (Mata versiones atascadas)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister().then(function(boolean) {
+              if(boolean) {
+                  console.log('Service Worker fantasma eliminado.');
+                  // Forzamos una recarga limpia desde el servidor
+                  window.location.reload(true); 
+              }
+          });
+        }
+      });
+    }
+  </script>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAL: CAPTURA INE (OCR v8.0)
+       ══════════════════════════════════════════════════════════ -->
+  <div id="modalIneCapture" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:480px;">
+      <span class="close" onclick="window.closeIneCapture()">×</span>
+      <h3 style="margin-top:0; color:#ff7e00;">📷 Capturar INE</h3>
+
+      <!-- Tabs -->
+      <div class="ic-tabs">
+        <button id="icBtnTabCam"  class="primary-btn small-btn"   onclick="window.icSwitchTab('camera')">📷 Cámara</button>
+        <button id="icBtnTabFile" class="secondary-btn small-btn" onclick="window.icSwitchTab('file')">📁 Archivo</button>
+      </div>
+
+      <!-- TAB: Cámara -->
+      <div id="icTab_camera">
+        <div class="ic-camera-wrap">
+          <video id="icVideo" autoplay playsinline muted></video>
+          <div class="ic-ine-mask"></div>
+        </div>
+        <div id="icCameraError" style="display:none; color:#c62828; font-size:13px; margin:6px 0;"></div>
+        <button class="primary-btn" style="width:100%; margin-top:4px; font-size:15px; padding:13px;"
+                onclick="window.icCapturarFoto()">
+          📸 Capturar foto
+        </button>
+      </div>
+
+      <!-- TAB: Archivo -->
+      <div id="icTab_file" style="display:none;">
+        <p class="small" style="margin:0 0 8px 0;">Selecciona la foto del INE (JPG, PNG o PDF):</p>
+        <input type="file" accept="image/*,.pdf" onchange="window.icHandleFile(this)"
+               style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        <p class="small" style="margin-top:8px; color:#888;">
+          💡 Tip: toma la foto en un lugar bien iluminado y encuadra toda la credencial.
+        </p>
+      </div>
+
+      <!-- Vista previa + confirmación -->
+      <div id="icPreviewSection" style="display:none; margin-top:14px;">
+        <p class="small" style="margin:0 0 6px 0; font-weight:bold;">Vista previa (imagen comprimida):</p>
+        <img id="icPreviewImg" alt="INE preview"
+             style="width:100%; border-radius:8px; border:1px solid #ddd; display:block;">
+        <div id="icSizeBadge" class="img-size-badge" style="display:none; margin-top:6px;"></div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="secondary-btn" style="flex:1;" onclick="window.icRetomar()">🔄 Retomar</button>
+          <button class="primary-btn"   style="flex:2;" onclick="window.icUsarEstaImagen()">✅ Usar esta imagen</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+// ── Validación checkbox obligatorio (Integrar Círculo) ───────────────────────
+window.validarChecklistObligatorio = function(cb) {
+    // Solo resaltar — la validación real ocurre en extractCedulaData
+    const label = cb.closest('label') || cb.parentElement;
+    if (label) label.style.background = cb.checked ? '#e8f5e9' : '#fff3e0';
+};
+
+// ── Barra de progreso de integrantes ──────────────────────────────────────────
+window.actualizarBarraProgreso = function(n) {
+    const bar   = document.getElementById('barraProgreso');
+    const label = document.getElementById('barraProgreso_label');
+    if (!bar) return;
+    const pct = Math.min(100, Math.max(2, (n / 18) * 100));
+    bar.style.width = pct + '%';
+    if      (n >= 10) { bar.style.backgroundColor = '#43a047'; }
+    else if (n >= 6)  { bar.style.backgroundColor = '#f9a825'; }
+    else              { bar.style.backgroundColor = '#e53935'; }
+    if (label) {
+        if      (n >= 10) label.textContent = '✅ Círculo sólido (' + n + '/18)';
+        else if (n >= 6)  label.textContent = '⚠️ Mínimo alcanzado (' + n + '/18) — sigue sumando';
+        else              label.textContent = '🔴 Faltan ' + (6 - n) + ' para el mínimo (necesitas 6)';
+    }
+};
+
+// Interceptar actualizaciones del contador existente
+const _origContador = document.getElementById('contadorMiembrosActuales');
+if (_origContador) {
+    const observer = new MutationObserver(() => {
+        const n = parseInt(_origContador.textContent) || 1;
+        window.actualizarBarraProgreso(n);
+    });
+    observer.observe(_origContador, { childList: true, characterData: true, subtree: true });
+}
+
+// ── Exclusión mutua firma autógrafa / digital ─────────────────────────────────
+window.toggleFirmaModo = function(modo) {
+    const secAuto  = document.getElementById('firma_seccion_autografa');
+    const secDig   = document.getElementById('firma_seccion_digital');
+    const tabAuto  = document.getElementById('firma_tab_autografa');
+    const tabDig   = document.getElementById('firma_tab_digital');
+    if (!secAuto || !secDig) return;
+
+    if (modo === 'autografa') {
+        secAuto.style.display = '';
+        secDig.style.display  = 'none';
+        if (tabAuto) { tabAuto.style.border = '2px solid #ff7e00'; tabAuto.style.background = '#fff3e0'; }
+        if (tabDig)  { tabDig.style.border  = '2px solid #ddd';    tabDig.style.background  = '#fff'; }
+        // Limpiar campos digitales
+        const fn = document.getElementById('cedula_firma_nombre');
+        const fc = document.getElementById('cedula_firma_curp');
+        if (fn) fn.value = '';
+        if (fc) fc.value = '';
+    } else {
+        secAuto.style.display = 'none';
+        secDig.style.display  = '';
+        if (tabDig)  { tabDig.style.border  = '2px solid #ff7e00'; tabDig.style.background  = '#fff3e0'; }
+        if (tabAuto) { tabAuto.style.border = '2px solid #ddd';    tabAuto.style.background = '#fff'; }
+        // Limpiar canvas
+        const canvas = document.getElementById('sigCanvas');
+        if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    }
+};
+</script>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: BITÁCORA DE SESIONES (Art. 15 Reglamento CC)          -->
+  <!-- ============================================================ -->
+  <div id="modalSesiones" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:750px; max-height:90vh; overflow-y:auto;">
+      <span class="close" onclick="closeModal('modalSesiones')">&times;</span>
+      <div style="background:#0d47a1;color:#fff;padding:14px 18px;border-radius:8px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:28px;">&#x1F4CB;</span>
+        <div>
+          <h3 style="margin:0;font-size:18px;">Bit&#xE1;cora de Sesiones</h3>
+          <p style="margin:2px 0 0;font-size:12px;opacity:0.85;" id="sesiones-circle-subtitle">C&#xED;rculo Ciudadano</p>
+        </div>
+      </div>
+
+      <!-- Formulario nueva sesión -->
+      <details id="nueva-sesion-details" style="margin-bottom:18px;">
+        <summary style="background:#e3f2fd;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:bold;color:#0d47a1;list-style:none;user-select:none;">
+          &#x2795; Registrar Nueva Sesi&#xF3;n
+        </summary>
+        <div style="background:#f8fbff;border:1px solid #bbdefb;border-radius:0 0 8px 8px;padding:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label>Fecha de la Sesi&#xF3;n:</label>
+              <input type="date" id="ses_fecha" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+              <label>Hora:</label>
+              <input type="time" id="ses_hora" value="18:00" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+              <label>Tipo:</label>
+              <select id="ses_tipo" style="width:100%;box-sizing:border-box;">
+                <option value="ordinaria">&#x1F4C5; Ordinaria (quincenal)</option>
+                <option value="extraordinaria">&#x26A1; Extraordinaria</option>
+              </select>
+            </div>
+            <div>
+              <label>Lugar:</label>
+              <input type="text" id="ses_lugar" placeholder="Ej: Casa del coordinador, sal&#xF3;n comunal..." style="width:100%;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-weight:bold;color:#0d47a1;">&#x2705; Asistentes de la Sesi&#xF3;n:</label>
+            <div id="ses_asistentes_checks" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;background:#fff;padding:10px;border-radius:6px;border:1px solid #ddd;min-height:40px;"></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-weight:bold;">&#x1F4DD; Acuerdos de la Sesi&#xF3;n: <span style="color:#dc3545;">*</span></label>
+            <textarea id="ses_acuerdos" rows="4" placeholder="Describe los acuerdos y resoluciones tomadas en esta sesi&#xF3;n..." style="width:100%;box-sizing:border-box;margin-top:4px;"></textarea>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>&#x1F4CE; Notas Adicionales:</label>
+            <textarea id="ses_notas" rows="2" placeholder="Observaciones, pendientes, comentarios..." style="width:100%;box-sizing:border-box;margin-top:4px;"></textarea>
+          </div>
+          <button class="primary-btn" onclick="window.guardarSesion()" style="width:100%;">&#x1F4BE; Guardar Sesi&#xF3;n</button>
+        </div>
+      </details>
+
+      <!-- Lista de sesiones registradas -->
+      <div id="sesiones-list">
+        <p style="text-align:center;color:#aaa;padding:20px;">Cargando sesiones...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: OBSERVATORIO CIUDADANO (Art. 17 Reglamento CC)        -->
+  <!-- ============================================================ -->
+  <div id="modalObservatorio" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:820px; max-height:90vh; overflow-y:auto;">
+      <span class="close" onclick="closeModal('modalObservatorio')">&times;</span>
+      <div style="background:#1b5e20;color:#fff;padding:14px 18px;border-radius:8px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:30px;">&#x1F52D;</span>
+        <div>
+          <h3 style="margin:0;font-size:18px;">Observatorio Ciudadano</h3>
+          <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">Coordinadores de C&#xED;rculos por Municipio &middot; Art. 17 del Reglamento CC</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div>
+          <label>Filtrar por Estado:</label>
+          <select id="obs_filtro_estado" onchange="window.renderObservatorio()" style="width:100%;box-sizing:border-box;"></select>
+        </div>
+        <div>
+          <label>Filtrar por Municipio:</label>
+          <input type="text" id="obs_filtro_municipio" placeholder="Escribe municipio..." oninput="window.renderObservatorio()" style="width:100%;box-sizing:border-box;">
+        </div>
+      </div>
+      <div id="observatorio-content">
+        <p style="text-align:center;color:#aaa;padding:30px;">Selecciona un estado para ver el Observatorio.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

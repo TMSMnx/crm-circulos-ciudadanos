@@ -1,0 +1,88 @@
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the "ea-php82" package as the default "PHP" programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
+# ====================================================================
+# SEGURIDAD - CRM Círculos Ciudadanos v12.0
+# ====================================================================
+
+# Desactivar listado de directorios
+Options -Indexes
+
+# Bloquear acceso directo a archivos sensibles
+<FilesMatch "^(crm_secrets|global_config|\.env|db)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# manifest.json es público (requerido para PWA / ícono de app)
+<Files "manifest.json">
+    Order allow,deny
+    Allow from all
+</Files>
+
+# Bloquear todos los demás .json, .sql, .log, etc.
+<FilesMatch "\.(json|sql|log|bak|sh|git)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloquear acceso a archivos de prueba y backup
+<FilesMatch "^(test|phpinfo|info|debug)\.(php|html?)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# MIME types para WebAssembly (requerido para Tesseract)
+<IfModule mod_mime.c>
+    AddType application/wasm .wasm
+</IfModule>
+
+# Cabeceras de seguridad HTTP
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(self), microphone=(), geolocation=(self)"
+
+    # No cachear HTML — fuerza al browser a siempre pedir la versión más reciente
+    <FilesMatch "\.(html?)$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </FilesMatch>
+
+    Header always unset Content-Security-Policy
+    # CSP: cdn.jsdelivr.net en script-src permite que los blob workers de Tesseract carguen
+    # su worker.min.js como fallback, incluso si el browser tiene cacheado código viejo.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org; font-src 'self' data: https://cdnjs.cloudflare.com https://unpkg.com; connect-src 'self' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://raw.githubusercontent.com https://tessdata.projectnaptha.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org; worker-src 'self' blob:; child-src blob:; frame-ancestors 'none';"
+</IfModule>
+
+# Forzar HTTPS
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Bloquear acceso a directorios ocultos (.git, .svn, etc.)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule "(^|/)\." - [F,L]
+</IfModule>
+
+# Prevenir inyección de scripts en URL
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+    RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+    RewriteRule .* index.php [F,L]
+</IfModule>
+
+# Desactivar la firma del servidor
+ServerSignature Off

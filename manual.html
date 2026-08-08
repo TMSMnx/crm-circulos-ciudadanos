@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual CRM Círculos Ciudadanos v15.29</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange:   #E8560A;
+  --orange-m: #F4811F;
+  --orange-l: #FDE8D4;
+  --blue:     #1a2e6c;
+  --bg:       #fff9f5;
+  --card:     #ffffff;
+  --text:     #1a1d2e;
+  --muted:    #6b7280;
+  --border:   #f0dece;
+  --green:    #16a34a;
+  --amber:    #d97706;
+  --red:      #dc2626;
+  --code-bg:  #1e293b;
+  --code-text:#e2e8f0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', Arial, sans-serif; font-size: 14px; color: var(--text); background: var(--bg); line-height: 1.6; }
+
+/* ── HEADER ── */
+.doc-header {
+  background: linear-gradient(135deg, #1a2142 0%, var(--orange) 80%, var(--orange-m) 100%);
+  color: #fff;
+  padding: 44px 32px 38px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.doc-header::before {
+  content: '';
+  position: absolute;
+  left: -60px; top: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  border: 50px solid rgba(255,255,255,.07);
+}
+.doc-header::after {
+  content: '';
+  position: absolute;
+  right: -80px; bottom: -80px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  border: 60px solid rgba(255,255,255,.06);
+}
+.doc-header .org { font-size: 0.85rem; font-weight: 600; opacity: .75; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
+.doc-header .brand { font-family: 'Exo 2', sans-serif; font-weight: 900; font-size: 2.1rem; letter-spacing: -.02em; margin-bottom: 4px; }
+.doc-header h1 { font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 1.1rem; opacity: .85; margin-bottom: 16px; }
+.meta-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.chip { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.28); border-radius: 20px; padding: 4px 14px; font-size: 0.79rem; font-weight: 600; }
+.chip.ok { background: rgba(22,163,74,.4); border-color: rgba(22,163,74,.5); }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 11px 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  flex-wrap: wrap;
+}
+.toolbar a { color: var(--orange); text-decoration: none; font-size: 0.82rem; font-weight: 600; opacity: .8; }
+.toolbar a:hover { opacity: 1; }
+.toolbar .sep { color: var(--border); font-size: 0.8rem; }
+.btn-print {
+  margin-left: auto;
+  padding: 7px 18px;
+  background: var(--orange);
+  color: #fff; border: none; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-print:hover { background: var(--orange-m); }
+
+/* ── LAYOUT ── */
+.layout { display: grid; grid-template-columns: 240px 1fr; max-width: 1120px; margin: 0 auto; gap: 0; padding: 32px 16px; align-items: start; }
+
+/* ── TOC ── */
+.toc { position: sticky; top: 66px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-right: 28px; }
+.toc h2 { font-family: 'Exo 2', sans-serif; font-size: 0.72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
+.toc ol { list-style: none; counter-reset: toc; }
+.toc li { counter-increment: toc; margin-bottom: 2px; }
+.toc a { display: flex; align-items: baseline; gap: 8px; color: var(--text); text-decoration: none; font-size: 0.81rem; padding: 5px 8px; border-radius: 6px; transition: background .15s, color .15s; }
+.toc a::before { content: counter(toc); font-weight: 700; font-size: 0.7rem; color: var(--orange); min-width: 16px; }
+.toc a:hover { background: var(--orange-l); color: var(--orange); }
+
+/* ── SECTIONS ── */
+.content { min-width: 0; }
+.section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; margin-bottom: 24px; }
+.section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--orange); }
+.section-num { width: 32px; height: 32px; border-radius: 8px; background: var(--orange); color: #fff; font-family: 'Exo 2', sans-serif; font-weight: 900; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.section-title h2 { font-family: 'Exo 2', sans-serif; font-size: 1.12rem; font-weight: 700; color: var(--orange); }
+h3 { font-family: 'Exo 2', sans-serif; font-size: 0.93rem; font-weight: 700; color: var(--text); margin: 20px 0 10px; padding-left: 10px; border-left: 3px solid var(--orange-m); }
+h4 { font-size: 0.87rem; font-weight: 700; color: var(--orange); margin: 14px 0 6px; }
+p { margin-bottom: 10px; }
+ul, ol { padding-left: 20px; margin-bottom: 10px; }
+li { margin-bottom: 4px; font-size: 0.9rem; }
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+thead tr { background: var(--orange); color: #fff; }
+thead th { padding: 9px 14px; text-align: left; font-weight: 600; font-size: 0.82rem; letter-spacing: .03em; }
+thead th:first-child { border-radius: 6px 0 0 0; }
+thead th:last-child  { border-radius: 0 6px 0 0; }
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:hover { background: var(--orange-l); }
+tbody td { padding: 8px 14px; vertical-align: top; }
+tbody td:first-child { font-weight: 600; color: var(--orange); white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+/* ── CODE ── */
+pre { background: var(--code-bg); color: var(--code-text); border-radius: 10px; padding: 18px 20px; overflow-x: auto; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.81rem; line-height: 1.7; margin: 12px 0; }
+code { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.81rem; background: var(--orange-l); color: var(--orange); padding: 2px 6px; border-radius: 4px; }
+pre code { background: transparent; color: inherit; padding: 0; font-size: inherit; }
+
+/* ── CALLOUT ── */
+.callout { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 8px; margin: 14px 0; font-size: 0.88rem; }
+.callout.warn  { background: #fef3c7; border-left: 3px solid var(--amber); }
+.callout.info  { background: #eff6ff; border-left: 3px solid #3b82f6; }
+.callout.ok    { background: #f0fdf4; border-left: 3px solid var(--green); }
+.callout.orange{ background: var(--orange-l); border-left: 3px solid var(--orange); }
+.callout-icon  { font-size: 1.1rem; line-height: 1.4; flex-shrink: 0; }
+
+/* ── ROLE GRID ── */
+.role-level { margin-bottom: 18px; }
+.level-tag { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: .04em; margin-bottom: 10px; }
+.level-1 { background: #1a2142; color: #fff; }
+.level-2 { background: var(--orange); color: #fff; }
+.level-3 { background: #f59e0b; color: #fff; }
+.level-4 { background: #6b7280; color: #fff; }
+.level-5 { background: #e5e7eb; color: #374151; }
+
+/* ── FEATURE CARDS ── */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+.feat-card { background: var(--orange-l); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.feat-card .feat-icon { font-size: 1.4rem; margin-bottom: 6px; }
+.feat-card h4 { margin: 0 0 4px; font-size: 0.85rem; color: var(--orange); }
+.feat-card p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+
+/* ── SECURITY TABLE ── */
+.sec-grid { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.sec-item { display: flex; align-items: flex-start; gap: 12px; padding: 9px 14px; background: var(--bg); border-radius: 8px; font-size: 0.87rem; }
+.sec-check { color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+/* ── CHANGELOG ── */
+.cl-version { display: flex; align-items: center; gap: 10px; margin: 14px 0 6px; }
+.cl-version .v { font-weight: 700; font-size: 0.9rem; font-family: 'JetBrains Mono', monospace; }
+.cl-version .d { font-size: 0.79rem; color: var(--muted); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; }
+.badge-orange { background: var(--orange); color: #fff; }
+.badge-gray   { background: #e5e7eb; color: #374151; }
+.cl-items { list-style: none; padding: 0; margin-bottom: 10px; }
+.cl-items li { padding: 4px 0 4px 20px; position: relative; font-size: 0.86rem; color: var(--text); border-bottom: 1px solid var(--bg); }
+.cl-items li::before { content: '→'; position: absolute; left: 4px; color: var(--orange-m); font-weight: 700; }
+
+/* ── FOOTER ── */
+.doc-footer { text-align: center; padding: 28px; color: var(--muted); font-size: 0.8rem; }
+
+/* ── PRINT ── */
+@media print {
+  .toolbar, .toc, .btn-print { display: none !important; }
+  .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+  .doc-header { padding: 24px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #fff; font-size: 11pt; }
+  .section { border: 1px solid #ddd; padding: 18px; margin-bottom: 14px; page-break-inside: avoid; box-shadow: none; }
+  pre { font-size: 8.5pt; }
+  table { font-size: 8.5pt; }
+  thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .callout { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .toc { display: none; }
+  .section { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="org">Movimiento Ciudadano</div>
+  <div class="brand">CRM Círculos Ciudadanos</div>
+  <h1>Manual del Sistema</h1>
+  <div class="meta-chips">
+    <span class="chip">Sistema v15.29</span>
+    <span class="chip">Manual v1.0</span>
+    <span class="chip">2026-06-10</span>
+    <span class="chip ok">En producción</span>
+    <span class="chip">Desarrollado con Claude Code</span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <a href="#sec1">Resumen</a><span class="sep">·</span>
+  <a href="#sec3">Acceso</a><span class="sep">·</span>
+  <a href="#sec4">Círculos</a><span class="sep">·</span>
+  <a href="#sec5">Roles</a><span class="sep">·</span>
+  <a href="#sec6">Centro de Mando</a><span class="sep">·</span>
+  <a href="#sec7">Módulos</a><span class="sep">·</span>
+  <a href="#sec9">Seguridad</a><span class="sep">·</span>
+  <a href="#sec10">Changelog</a>
+  <button class="btn-print" onclick="window.print()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+    Imprimir / PDF
+  </button>
+</div>
+
+<div class="layout">
+
+  <nav class="toc">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#sec1">Resumen del proyecto</a></li>
+      <li><a href="#sec2">Estructura de archivos</a></li>
+      <li><a href="#sec3">Acceso al sistema</a></li>
+      <li><a href="#sec4">Módulo de Círculos</a></li>
+      <li><a href="#sec5">Roles y permisos</a></li>
+      <li><a href="#sec6">Centro de Mando</a></li>
+      <li><a href="#sec7">Módulos especializados</a></li>
+      <li><a href="#sec8">Configuración del servidor</a></li>
+      <li><a href="#sec9">Seguridad</a></li>
+      <li><a href="#sec10">Registro de cambios</a></li>
+    </ol>
+  </nav>
+
+  <div class="content">
+
+    <!-- 1 -->
+    <div class="section" id="sec1">
+      <div class="section-title"><div class="section-num">1</div><h2>Resumen del proyecto</h2></div>
+      <p>CRM en la nube para gestión territorial de <strong>Círculos Ciudadanos</strong> de Movimiento Ciudadano. Registra cédulas de afiliación, genera documentos oficiales (Actas Constitutivas y Credenciales individuales) y administra la estructura organizacional del partido a nivel nacional, estatal y municipal.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dato</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>Stack</td><td>PHP + MySQL (backend) · HTML/CSS/JS puro (frontend)</td></tr>
+            <tr><td>Arquitectura</td><td>SPA (Single Page Application) con API REST en PHP</td></tr>
+            <tr><td>Modalidad</td><td>PWA — instalable en móvil y escritorio sin app store</td></tr>
+            <tr><td>Versión actual</td><td>15.29 (2026-05-15)</td></tr>
+            <tr><td>Base de datos</td><td>MySQL en servidor cPanel</td></tr>
+            <tr><td>Autenticación</td><td>Sesión PHP server-side + contraseñas bcrypt</td></tr>
+            <tr><td>OCR</td><td>Tesseract.js 4 auto-hospedado (lectura de INE)</td></tr>
+            <tr><td>PDF</td><td>Motor propio <code>pdf-engine.js</code> (canvas → PDF)</td></tr>
+            <tr><td>Mapas</td><td>Leaflet.js auto-hospedado</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Objetivos del sistema</h3>
+      <div class="feature-grid">
+        <div class="feat-card"><div class="feat-icon">📋</div><h4>Registro de Círculos</h4><p>Mínimo 6 integrantes, captura de INE por OCR</p></div>
+        <div class="feat-card"><div class="feat-icon">📄</div><h4>Documentos Oficiales</h4><p>Acta Constitutiva y Cédulas en PDF</p></div>
+        <div class="feat-card"><div class="feat-icon">🗺️</div><h4>Mapa Territorial</h4><p>Densidad por estado y municipio</p></div>
+        <div class="feat-card"><div class="feat-icon">🔐</div><h4>RBAC Multinivel</h4><p>Jerarquía nacional–estatal–municipal</p></div>
+        <div class="feat-card"><div class="feat-icon">📡</div><h4>Offline First</h4><p>Registro sin internet, sync al reconectarse</p></div>
+        <div class="feat-card"><div class="feat-icon">🛡️</div><h4>Auditoría Total</h4><p>Cada acción queda registrada en log</p></div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="section" id="sec2">
+      <div class="section-title"><div class="section-num">2</div><h2>Estructura de archivos</h2></div>
+<pre>public_html/
+├── index.html                  ← SPA principal (dashboard + todos los modales)
+├── api.php                     ← API REST PHP (todas las acciones del CRM)
+├── db.php                      ← Conexión y funciones de base de datos
+├── circmast.php                ← Módulo de gestión de círculos (backend)
+├── admin_compress_ine.php      ← Herramienta admin de compresión masiva INE
+├── validar.html                ← Validador público de credenciales (sin login)
+├── style.css                   ← Estilos globales de la aplicación
+├── sw.js                       ← Service Worker (soporte offline / PWA)
+├── manifest.json               ← Manifiesto PWA
+├── .htaccess                   ← Seguridad, HTTPS forzado, CSP
+├── version.json                ← Versión actual del sistema
+├── global_config.json          ← Reglas de tráfico y roles personalizados
+│
+├── js/
+│   ├── config.js               ← Constantes globales, roles, estados, causas
+│   ├── auth.js                 ← Autenticación, sesión, hasPermission()
+│   ├── main.js                 ← Orquestador de eventos y modo offline
+│   ├── api-service.js          ← Capa de comunicación con api.php
+│   ├── circles-manager.js      ← CRUD de círculos, flujo de registro, PDF
+│   ├── admin-manager.js        ← Centro de Mando, usuarios, roles, auditoría
+│   ├── events-manager.js       ← Agenda y calendario de eventos
+│   ├── ocr-engine.js           ← Motor OCR para lectura de INE
+│   ├── pdf-engine.js           ← Generación de Actas y Cédulas en PDF
+│   ├── utils.js                ← Funciones auxiliares (modales, notificaciones)
+│   ├── municipios.js           ← Catálogo de 2,478 municipios (INEGI Mar-2026)
+│   └── tesseract.*             ← Tesseract.js 4 auto-hospedado (worker+WASM)
+│
+├── tessdata/
+│   └── spa.traineddata.gz      ← Modelo OCR español (acceso bloqueado por HTTP)
+│
+├── img/                        ← Logos e imágenes del sistema
+└── uploads/                    ← Archivos subidos (scripts bloqueados por .htaccess)</pre>
+    </div>
+
+    <!-- 3 -->
+    <div class="section" id="sec3">
+      <div class="section-title"><div class="section-num">3</div><h2>Acceso al sistema</h2></div>
+      <h3>Login</h3>
+      <ul>
+        <li>URL de producción requiere <strong>HTTPS obligatorio</strong> (HTTP redirige automáticamente)</li>
+        <li>Usuario y contraseña proporcionados por el administrador</li>
+        <li>Las contraseñas se almacenan con <strong>bcrypt</strong> — nunca en texto plano</li>
+        <li>La versión del sistema aparece en la pantalla de login</li>
+      </ul>
+      <h3>Sesión</h3>
+      <ul>
+        <li>Validada en el servidor en <em>cada</em> llamada a <code>api.php</code></li>
+        <li>Logout limpio que destruye la sesión tanto en servidor como en cliente</li>
+        <li>Forzar logout global disponible desde Centro de Mando para emergencias</li>
+      </ul>
+      <h3>Primer acceso de un usuario nuevo</h3>
+      <ol>
+        <li>El admin crea la cuenta desde Centro de Mando → Gestión de Usuarios</li>
+        <li>El sistema genera una contraseña temporal (formato: <code>Palabra+N+Palabra+N</code>)</li>
+        <li>Se muestra en panel verde con botón "Copiar" — se entrega al usuario</li>
+        <li>Se recomienda cambiarla en el primer login desde el Perfil</li>
+      </ol>
+      <div class="callout warn">
+        <div class="callout-icon">⚠️</div>
+        <div>La sesión se valida en servidor en cada operación. Si el usuario manipula <code>window.CRM.currentUser</code> desde la consola, el servidor rechazará la petición al verificar la sesión PHP real.</div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="section" id="sec4">
+      <div class="section-title"><div class="section-num">4</div><h2>Módulo de Círculos Ciudadanos</h2></div>
+
+      <h3>Tipos de círculo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Descripción</th><th>Opciones disponibles</th></tr></thead>
+          <tbody>
+            <tr><td>Causas</td><td>Orientado a causas sociales, políticas o comunitarias</td><td>26 causas disponibles</td></tr>
+            <tr><td>Lúdico</td><td>Orientado a actividades recreativas y culturales</td><td>15 actividades disponibles</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Causas disponibles (selección)</h3>
+      <p style="font-size:.88rem;color:var(--muted)">Medio ambiente, participación ciudadana, derechos humanos, igualdad de género, LGBTTTIQ+, educación pública, salud universal, MIPYMES, seguridad ciudadana, pueblos indígenas, migrantes en retorno, y 15 causas más.</p>
+
+      <h3>Flujo de registro de un círculo</h3>
+<pre>1. Login → Dashboard
+2. Botón "Crear Círculo" (disponible según reglas de tráfico del día)
+3. Seleccionar tipo: Causas o Lúdico
+4. Elegir causas o actividades
+5. Completar el Acta Constitutiva:
+   — Nombre del círculo, estado, municipio, sección electoral
+   — Fecha y hora local del dispositivo (no UTC)
+6. Agregar integrantes (MÍNIMO 6):
+   a. Foto de perfil (cámara o archivo — comprimida ≤ 80 KB)
+   b. Fotografía del INE → OCR extrae nombre, CURP, sección automáticamente
+   c. Datos personales y firma autógrafa digital en canvas
+   d. Designar UN coordinador (badge naranja en su credencial)
+7. Al completar 6+ integrantes → botón "Finalizar Círculo" se habilita
+8. Generar PDF: Acta Constitutiva + Cédulas individuales
+9. Guardar → sube a la nube (o queda en cola offline si no hay conexión)</pre>
+
+      <div class="callout orange">
+        <div class="callout-icon">🟠</div>
+        <div><strong>Reglas de tráfico:</strong> los roles de Alto Mando siempre pueden crear círculos. Los demás usuarios dependen de la configuración del Centro de Mando: qué estados y roles tienen turno cada día de la semana.</div>
+      </div>
+
+      <h3>Datos del Acta Constitutiva</h3>
+      <ul>
+        <li>Nombre del círculo, tipo y causas/actividades seleccionadas</li>
+        <li>Estado, municipio (de catálogo INEGI 2026), sección electoral</li>
+        <li>Fecha y hora de constitución — capturada en tiempo local del dispositivo</li>
+        <li>Firma autógrafa del coordinador en canvas táctil</li>
+      </ul>
+
+      <h3>Datos de cada integrante (Cédula Individual)</h3>
+      <ul>
+        <li>Foto de perfil comprimida (≤ 80 KB)</li>
+        <li>Nombre completo, CURP</li>
+        <li>Foto del INE anverso comprimida (≤ 150 KB)</li>
+        <li>Año y vigencia de la credencial INE</li>
+        <li>Sección electoral, redes sociales (opcional)</li>
+        <li>Firma autógrafa digital (canvas → base64)</li>
+        <li>Badge naranja <strong>COORDINADOR</strong> si es el coordinador designado del círculo</li>
+      </ul>
+    </div>
+
+    <!-- 5 -->
+    <div class="section" id="sec5">
+      <div class="section-title"><div class="section-num">5</div><h2>Sistema de roles y permisos</h2></div>
+
+      <div class="role-level">
+        <span class="level-tag level-1">🔵 Nivel 1 — Alto Mando</span>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Capacidades</th></tr></thead>
+            <tbody>
+              <tr><td>superadmin</td><td>Acceso total al sistema, consola de emergencia para crear superadmin</td></tr>
+              <tr><td>secretario_nacional</td><td>Admin general: borrado directo, Centro de Mando completo, bitácora</td></tr>
+              <tr><td>coordinador_nacional</td><td>Lectura completa nacional — sin crear, editar ni borrar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="role-level">
+        <span class="level-tag level-2">🟠 Nivel 2 — Titulares Nacionales</span>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Crea y gestiona</th></tr></thead>
+            <tbody>
+              <tr><td>titular_nacional_jovenes</td><td>Delegados estatales, municipales y de circunscripción (Jóvenes)</td></tr>
+              <tr><td>titular_nacional_mujeres</td><td>Delegadas de Mujeres (3 niveles)</td></tr>
+              <tr><td>titular_nacional_trabajadores</td><td>Delegados de Trabajadores (3 niveles)</td></tr>
+              <tr><td>titular_nacional_fundacion</td><td>Delegados Fundación México con Valores (3 niveles)</td></tr>
+              <tr><td>titular_nacional_productores</td><td>Delegados Productores (3 niveles)</td></tr>
+              <tr><td>titular_nacional_migrante</td><td>Coordinadores estatales USA</td></tr>
+              <tr><td>diputado_federal</td><td>Coordinadores distritales federales, zonales y seccionales</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="role-level">
+        <span class="level-tag level-3">🟡 Nivel 3 — Estatales</span>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Capacidades</th></tr></thead>
+            <tbody>
+              <tr><td>secretario_estatal</td><td>Ve todos los círculos de su estado. Crea usuarios de nivel 4 hacia abajo. Puede solicitar borrado al Alto Mando.</td></tr>
+              <tr><td>delegado_estatal_*</td><td>Ven su estructura dentro del estado (5 áreas: jóvenes, mujeres, trabajadores, fundación, productores)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="role-level">
+        <span class="level-tag level-4">⚫ Nivel 4 — Municipales y Distritales</span>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Puede crear</th></tr></thead>
+            <tbody>
+              <tr><td>secretario_municipal</td><td>Solo <code>invitado_especial</code></td></tr>
+              <tr><td>coordinador_distrital_federal/local</td><td>Su estructura distrital</td></tr>
+              <tr><td>regidor, sindico, diputado_local</td><td>Su territorio asignado</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="role-level">
+        <span class="level-tag level-5">⬜ Nivel 5 — Roles especiales</span>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Función</th></tr></thead>
+            <tbody>
+              <tr><td>validacion</td><td>Mesa de Control: valida cédulas (semáforo verde/rojo). No crea contenido.</td></tr>
+              <tr><td>delegado_especial</td><td>Rol genérico de apoyo</td></tr>
+              <tr><td>invitado_especial</td><td>Acceso básico, creado solo por nivel municipal</td></tr>
+              <tr><td>coordinador_estatal_usa</td><td>Estructura Migrante en EE.UU. y Puerto Rico</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>Permisos clave</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Acción</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Borrar usuarios o círculos</td><td>Solo <code>superadmin</code> y <code>secretario_nacional</code></td></tr>
+            <tr><td>Acceder a Centro de Mando</td><td>Roles nacionales + secretario_estatal</td></tr>
+            <tr><td>Ver bitácora del sistema</td><td><code>superadmin</code> y <code>secretario_nacional</code></td></tr>
+            <tr><td>Aprobar solicitudes de borrado</td><td>Alto Mando</td></tr>
+            <tr><td>Validar cédulas</td><td>Rol <code>validacion</code> (Mesa de Control)</td></tr>
+            <tr><td>Crear círculos</td><td>Todos los roles (según reglas de tráfico)</td></tr>
+            <tr><td>Importación masiva de usuarios</td><td>Nacionales + secretario_estatal</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Roles personalizables</h3>
+      <p>Configurados en <code>global_config.json</code> y desde Centro de Mando → Roles Personalizados:</p>
+      <ul>
+        <li>100 Líderes · Consejo Nacional · Campus Naranja</li>
+        <li>Equipo Diputados Federales · Fundación México con Valores</li>
+        <li>Solo pueden crearlos: secretario_nacional, titular_nacional, secretario_estatal</li>
+      </ul>
+    </div>
+
+    <!-- 6 -->
+    <div class="section" id="sec6">
+      <div class="section-title"><div class="section-num">6</div><h2>Centro de Mando</h2></div>
+      <p>Panel de administración avanzado, accesible desde el dashboard para roles autorizados. Contiene las siguientes pestañas:</p>
+
+      <h3>Gestión de Usuarios</h3>
+      <ul>
+        <li>Tablero de totales: total, estados activos, nuevos últimos 30d, bloqueados</li>
+        <li>Distribución de usuarios por estado con fecha del último acceso</li>
+        <li>Crear, editar, bloquear y desbloquear cuentas</li>
+        <li>Historial de acciones por usuario (drill-down inline)</li>
+        <li>Generación de contraseña temporal con botón "Copiar"</li>
+        <li>Reset masivo de contraseñas con selector múltiple + descarga Excel</li>
+        <li><strong>Alertas automáticas al abrir:</strong> nunca conectados · inactivos +30d · bloqueados · sin estado</li>
+      </ul>
+
+      <h3>🚑 Rescate de Círculos</h3>
+      <p>Detecta y corrige anomalías en los círculos registrados:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Definición</th></tr></thead>
+          <tbody>
+            <tr><td>Limbo</td><td>Círculos sin estado asignado</td></tr>
+            <tr><td>Huérfanos</td><td>Círculos sin coordinador registrado</td></tr>
+            <tr><td>Desplazados</td><td>Estado del círculo ≠ estado del creador</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Corrección inline: reasignar coordinador y/o estado desde el panel con un formulario por círculo.</p>
+
+      <h3>Solicitudes</h3>
+      <ul>
+        <li><strong>Cambio de Rol:</strong> usuario solicita cambio de cargo con motivo → admin aprueba o rechaza</li>
+        <li><strong>Solicitudes de Borrado:</strong> secretario_estatal solicita eliminar usuario o círculo → Alto Mando aprueba o rechaza</li>
+        <li>Ambas colas con badges de conteo independientes en la pestaña</li>
+      </ul>
+
+      <h3>Importación Masiva</h3>
+      <ul>
+        <li>Carga Excel o CSV con cualquier número de usuarios</li>
+        <li>Validación previa: roles, estados, nomenclatura</li>
+        <li>Genera contraseña temporal por usuario</li>
+        <li>Tabla de resultados descargable en Excel</li>
+        <li>Plantilla descargable con catálogo de roles y estados incluidos</li>
+      </ul>
+
+      <h3>Reglas de Tráfico</h3>
+      <p>Configurar qué estados y/o roles pueden crear círculos en qué día de la semana. El Alto Mando siempre tiene acceso sin restricción.</p>
+
+      <h3>Bitácora del Sistema</h3>
+      <p>Registro de todas las acciones: login, logout, crear/editar/borrar usuarios y círculos. Solo visible para <code>superadmin</code> y <code>secretario_nacional</code>.</p>
+
+      <h3>Modo Mantenimiento</h3>
+      <ul>
+        <li><strong>Banner informativo</strong> — avisa sin bloquear el acceso</li>
+        <li><strong>Bloqueo total</strong> — solo admins operan; el resto ve pantalla con cuenta regresiva</li>
+        <li>Estado distribuido vía heartbeat (ping cada 20 seg) sin recargar la página</li>
+        <li>El admin puede desactivar en cualquier momento desde el banner de emergencia</li>
+      </ul>
+
+      <h3>Consola Out-of-Band (<code>admin-console.php</code>)</h3>
+      <p>Acceso standalone independiente de la SPA, protegida por IP whitelist + token maestro + CSRF + rate limiting.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Pestaña</th><th>Función</th></tr></thead>
+          <tbody>
+            <tr><td>Estado del Sistema</td><td>Health check: PHP, BD, disco, extensiones</td></tr>
+            <tr><td>Mantenimiento</td><td>Banner/bloqueo + force-logout global</td></tr>
+            <tr><td>Usuarios</td><td>Desbloqueo, reset contraseña, tabla de bloqueados</td></tr>
+            <tr><td>Base de Datos</td><td>Estado de tablas + diagnóstico de columnas</td></tr>
+            <tr><td>Seguridad</td><td>Intentos fallidos 24h + checklist</td></tr>
+            <tr><td>Auditoría</td><td>Últimas 60 acciones + limpieza de logs</td></tr>
+            <tr><td>Anuncios</td><td>Anuncios globales por tipo (info/warning/success/danger)</td></tr>
+            <tr><td>Emergencia</td><td>Crear superadmin de emergencia</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="section" id="sec7">
+      <div class="section-title"><div class="section-num">7</div><h2>Módulos especializados</h2></div>
+
+      <h3>7.1 OCR — Lectura automática de INE</h3>
+      <ul>
+        <li>Motor: <strong>Tesseract.js 4 auto-hospedado</strong> (worker + WASM + tessdata en el propio servidor)</li>
+        <li>Sin dependencias CDN externas — funciona aunque cambien URLs de terceros</li>
+        <li>Captura desde cámara del dispositivo con máscara de recorte tipo INE</li>
+        <li>Compresión inteligente: fotos INE ≤ 150 KB · fotos perfil ≤ 80 KB</li>
+        <li>Extrae: nombre completo, CURP, sección electoral, vigencia</li>
+        <li>Compatible con credencial tipo E (la más reciente)</li>
+        <li>Los datos extraídos pre-llenan el formulario del integrante automáticamente</li>
+      </ul>
+
+      <h3>7.2 Generación de PDF</h3>
+      <ul>
+        <li>Motor: <code>js/pdf-engine.js</code> — canvas → jsPDF, todo en el navegador sin servidor</li>
+        <li><strong>Acta Constitutiva</strong>: datos del círculo + lista de integrantes + firma del coordinador</li>
+        <li><strong>Cédulas Individuales</strong>: foto, datos INE, firma autógrafa, badge coordinador</li>
+        <li>Regeneración disponible desde el panel de administración sin capturar de nuevo</li>
+        <li>Firma autógrafa compatible como base64 (captura en vivo) y como URL de servidor (regeneración)</li>
+      </ul>
+
+      <h3>7.3 Mapa Interactivo</h3>
+      <ul>
+        <li>Motor: Leaflet.js auto-hospedado</li>
+        <li><strong>Vista Puntual (Scatter)</strong>: ubicación GPS de cada círculo</li>
+        <li><strong>Vista Coroplética por Estado</strong>: densidad en escala naranja MC por entidad federativa</li>
+        <li><strong>Vista Coroplética por Municipio</strong>: requiere GeoJSON municipal en servidor</li>
+        <li>Caché de capas para navegación rápida entre vistas</li>
+      </ul>
+
+      <h3>7.4 Agenda de Eventos</h3>
+      <ul>
+        <li>Calendario visual con vista de mes dividida</li>
+        <li>Crear, editar y eliminar eventos con filtro por rol y estado</li>
+        <li>Escáner QR para registrar asistencia en tiempo real</li>
+        <li>Exportación de listado en PDF</li>
+      </ul>
+
+      <h3>7.5 Reportes</h3>
+      <ul>
+        <li><strong>Por Estado</strong>: conteo de círculos, usuarios y meta calculada (secciones INE × 2.5 = ~171,000 círculos nacionales)</li>
+        <li><strong>Por Circunscripción Electoral</strong> (1ª a 5ª Circunscripción)</li>
+        <li>Exportación a Excel y PDF</li>
+        <li><strong>Observatorio Ciudadano (Art. 17)</strong>: vista por municipio con semáforo de actividad y botones de convocatoria por WhatsApp</li>
+      </ul>
+
+      <h3>7.6 Bitácora de Sesiones de Círculo (Art. 15)</h3>
+      <p>Registro por círculo de: fecha, tipo de sesión, lugar, asistentes, quórum, acuerdos y notas. Cumple con el Artículo 15 del reglamento de Círculos Ciudadanos.</p>
+
+      <h3>7.7 Validador Público</h3>
+      <p><code>validar.html</code> — accesible sin login para cualquier persona. Escanea el QR impreso en una credencial y verifica su autenticidad contra la base de datos en tiempo real.</p>
+
+      <h3>7.8 Sincronización Offline</h3>
+      <ul>
+        <li>Círculos capturados sin internet se almacenan en <code>localStorage</code> del navegador</li>
+        <li>Banner de alerta muestra el conteo de círculos en cola de subida</li>
+        <li>Botón "Subir Ahora" disponible automáticamente al recuperar conexión</li>
+        <li>Reporte de resultados tras cada sincronización: subidos con éxito vs. pendientes</li>
+      </ul>
+    </div>
+
+    <!-- 8 -->
+    <div class="section" id="sec8">
+      <div class="section-title"><div class="section-num">8</div><h2>Configuración del servidor</h2></div>
+
+      <h3>Archivos críticos en producción</h3>
+<pre>public_html/
+  index.html, api.php, db.php, circmast.php
+  validar.html, style.css, sw.js, manifest.json
+  .htaccess, version.json, global_config.json, php.ini
+  js/  (todos los JS incluyendo Tesseract worker+WASM)
+  tessdata/spa.traineddata.gz
+  img/  (mc.jpeg, circulos.jpg, icono-app.png, default-avatar.png)
+  uploads/  (carpeta vacía con .htaccess)</pre>
+
+      <h3>Permisos recomendados (cPanel)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Carpeta / Archivo</th><th>Permiso</th></tr></thead>
+          <tbody>
+            <tr><td>public_html/</td><td>755</td></tr>
+            <tr><td>uploads/</td><td>755</td></tr>
+            <tr><td>tessdata/</td><td>755</td></tr>
+            <tr><td>js/</td><td>755</td></tr>
+            <tr><td>img/</td><td>755</td></tr>
+            <tr><td>Archivos .php</td><td>644</td></tr>
+            <tr><td>Archivos .html, .js, .css</td><td>644</td></tr>
+            <tr><td>.htaccess</td><td>644</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Credenciales de base de datos</h3>
+      <div class="callout warn">
+        <div class="callout-icon">⚠️</div>
+        <div>Las credenciales de BD se almacenan en variable de entorno externo al código. <strong>Nunca</strong> deben quedar en archivos PHP dentro del repositorio. Configurar en cPanel → Entorno, o en archivo <code>.env</code> excluido del repo.</div>
+      </div>
+
+      <h3>Bump de versión</h3>
+      <p>Ejecutar <code>bump-version.ps1</code> desde PowerShell para incrementar la versión en <code>version.json</code> y en <code>config.js</code> automáticamente.</p>
+    </div>
+
+    <!-- 9 -->
+    <div class="section" id="sec9">
+      <div class="section-title"><div class="section-num">9</div><h2>Seguridad</h2></div>
+      <div class="sec-grid">
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Contraseñas bcrypt</strong> — nunca en texto plano; costo factor configurable</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>HTTPS forzado</strong> — todo HTTP redirige automáticamente vía .htaccess</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Content Security Policy (CSP)</strong> — bloquea scripts no autorizados, inline no permitido</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Sesión validada en servidor</strong> — cada llamada a api.php verifica la sesión PHP real</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Credenciales BD en entorno externo</strong> — no en código fuente ni en repositorio</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Rate limiting</strong> — en acciones sensibles (login, API)</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Tokens CSRF</strong> — en formularios y acciones críticas</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Tabla audit_log</strong> — registro inmutable de todas las acciones del sistema</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Bloqueo de cuentas</strong> — tras N intentos fallidos; desbloqueo solo desde Centro de Mando</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Logout forzado global</strong> — distribuido a todos los clientes vía heartbeat en emergencias</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>Admin Console protegida</strong> — IP whitelist + token maestro separado de la sesión principal</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>uploads/.htaccess</strong> — bloquea ejecución de cualquier script subido por usuarios</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>tessdata/.htaccess</strong> — bloquea acceso HTTP directo al modelo OCR</div></div>
+        <div class="sec-item"><span class="sec-check">✅</span><div><strong>register_shutdown_function</strong> — captura errores fatales PHP y los devuelve como JSON controlado</div></div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="section" id="sec10">
+      <div class="section-title"><div class="section-num">10</div><h2>Registro de cambios (Changelog)</h2></div>
+
+      <div class="cl-version"><span class="v">v15.29</span><span class="d">2026-05-15</span><span class="badge badge-orange">actual</span></div>
+      <ul class="cl-items">
+        <li>Hardening Centro de Mando: verificación server-side de sesión (<code>check_session</code>) al abrir el modal</li>
+        <li>Fix .htaccess: excepción para <code>manifest.json</code> — evitaba 28 errores "Tracking Prevention" en Edge</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.28</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Consola Administrativa Out-of-Band (<code>admin-console.php</code>) v1.0 con 8 pestañas</li>
+        <li>Backend: <code>ping_user</code> incluye <code>force_logout</code> y <code>announcement</code>; Frontend: overlay de cierre forzado y banner de anuncio</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.27</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li><code>register_shutdown_function</code> captura errores fatales PHP devolviendo JSON en lugar de respuesta vacía</li>
+        <li>Fix <code>validate_credential</code>: columna <code>json_data → data</code>; auto-patch para <code>created_at</code> en tabla circles</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.26</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Modo Mantenimiento: banner informativo y bloqueo total distribuido por heartbeat (ping 20s)</li>
+        <li>Admin siempre ve banner con botón "Desactivar" de emergencia</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.25</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Fix visibilidad de círculos — 5 causas: comparación case-insensitive de estado, roles delegado_estatal_* a nivel 2</li>
+        <li>Nuevo Panel 🚑 Rescate de Círculos en Centro de Mando</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.24</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Panel de Control de Usuarios: tablero de totales, distribución por estado, alertas inteligentes</li>
+        <li>Bloqueo/desbloqueo de cuentas y reset masivo de contraseñas con Excel</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.23</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Panel unificado de Solicitudes en Centro de Mando: cola de Cambio de Rol + cola de Borrado</li>
+        <li>Backend: tabla <code>deletion_requests</code> con flujo completo de aprobación</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.22</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Jerarquía refactorizada: solo <code>superadmin</code> y <code>secretario_nacional</code> con borrado directo</li>
+        <li><code>coordinador_nacional</code> pasa a lectura nacional completa (sin crear/editar/borrar)</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.21</span><span class="d">2026-05-15</span></div>
+      <ul class="cl-items">
+        <li>Fix crítico PDF: firma autógrafa aparece correctamente en Acta y Cédulas al regenerar desde panel</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.19</span><span class="d">2026-05-12</span></div>
+      <ul class="cl-items">
+        <li>Mapa Choropleth: vistas "Por Estado" y "Por Municipio" con escala naranja MC proporcional a densidad</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.18</span><span class="d">2026-05-12</span></div>
+      <ul class="cl-items">
+        <li>Importación Masiva de Usuarios desde Excel/CSV con validación previa y contraseñas temporales</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.17</span><span class="d">2026-05-12</span></div>
+      <ul class="cl-items">
+        <li>Bitácora del Sistema completa en Centro de Mando; Corrector de Delegados duplicados</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.13</span><span class="d">2026-05-11</span></div>
+      <ul class="cl-items">
+        <li>Módulo Bitácora de Sesiones (Art. 15) y Observatorio Ciudadano (Art. 17)</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.12</span><span class="d">2026-05-11</span></div>
+      <ul class="cl-items">
+        <li>Mínimo de integrantes por círculo actualizado a 6; barra de progreso y mensajes ajustados</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v15.9</span><span class="d">2026-05-11</span></div>
+      <ul class="cl-items">
+        <li>Sistema de Solicitudes de ROL: usuarios solicitan cambio de cargo, admin aprueba/rechaza</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v14.4</span><span class="d">2026-05-09</span></div>
+      <ul class="cl-items">
+        <li>OCR v8.0: cámara con máscara INE, compresión inteligente, parser mejorado con filtro por palabra</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v14.0</span><span class="d">2026-05-07</span></div>
+      <ul class="cl-items">
+        <li>Catálogo completo de 2,478 municipios (INEGI Mar-2026); escáner QR valida contra BD</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v13.0</span><span class="d">2026-04-25</span></div>
+      <ul class="cl-items">
+        <li>Hardening: CSP, HTTPS forzado, bloqueo de archivos sensibles; Leaflet auto-hospedado; Validador público</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v12.0</span><span class="d">2026-04-10</span></div>
+      <ul class="cl-items">
+        <li>Sesión validada en servidor con bcrypt; logout limpio; QR con CURP en credenciales; modal foto iOS-safe</li>
+      </ul>
+
+      <div class="cl-version"><span class="v">v11.3</span><span class="d">2026-03-15</span></div>
+      <ul class="cl-items">
+        <li>Agenda Ciudadana: calendario pantalla dividida; escáner de asistencia a eventos; exportación PDF por estado</li>
+      </ul>
+
+    </div><!-- /sec10 -->
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<div class="doc-footer">
+  Manual generado con Claude Code (Anthropic) &nbsp;·&nbsp; Movimiento Ciudadano — Círculos Ciudadanos &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; v1.0
+</div>
+
+</body>
+</html>

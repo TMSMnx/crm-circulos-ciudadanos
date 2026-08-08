@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Seguridad — TerritoriOp CRM 2026</title>
+<style>
+  /* ── Fuentes ── */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Variables ── */
+  :root {
+    --naranja:  #E8490F;
+    --naranja2: #f97316;
+    --azul:     #1a237e;
+    --gris:     #475569;
+    --gris-claro: #f1f5f9;
+    --borde:    #cbd5e1;
+    --texto:    #1e293b;
+    --ok:       #15803d;
+    --warn:     #b45309;
+    --danger:   #b91c1c;
+  }
+
+  /* ── Página ── */
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--texto);
+    background: #fff;
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  /* ── Portada ── */
+  .portada {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+  }
+
+  .portada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 32px;
+    border-bottom: 3px solid var(--naranja);
+  }
+
+  .portada-logo-text {
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--naranja);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .portada-logo-sub {
+    font-size: 9pt;
+    color: var(--gris);
+    margin-top: 3px;
+  }
+
+  .portada-clasificacion {
+    font-size: 8.5pt;
+    background: var(--naranja);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: .5px;
+  }
+
+  .portada-centro {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 0 40px;
+  }
+
+  .portada-escudo {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .portada-tipo {
+    font-size: 10pt;
+    color: var(--naranja);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .portada-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 30pt;
+    color: var(--azul);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .portada-subtitulo {
+    font-size: 13pt;
+    color: var(--gris);
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .portada-linea {
+    width: 60px;
+    height: 3px;
+    background: var(--naranja);
+    margin: 0 auto 40px;
+    border-radius: 2px;
+  }
+
+  .portada-meta {
+    display: inline-flex;
+    gap: 32px;
+    background: var(--gris-claro);
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-size: 9.5pt;
+    color: var(--gris);
+  }
+
+  .portada-meta-item strong {
+    display: block;
+    color: var(--texto);
+    font-size: 10pt;
+  }
+
+  .portada-pie {
+    border-top: 1px solid var(--borde);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .portada-firmas {
+    display: flex;
+    gap: 64px;
+  }
+
+  .firma {
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .firma-linea {
+    width: 100%;
+    height: 1px;
+    background: var(--texto);
+    margin-bottom: 6px;
+  }
+
+  .firma-nombre {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--texto);
+  }
+
+  .firma-cargo {
+    font-size: 8.5pt;
+    color: var(--gris);
+    margin-top: 2px;
+  }
+
+  .portada-folio {
+    font-size: 8.5pt;
+    color: var(--gris);
+    text-align: right;
+  }
+
+  /* ── Secciones del informe ── */
+  .seccion {
+    margin-bottom: 36px;
+  }
+
+  .seccion-titulo {
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--azul);
+    border-bottom: 2px solid var(--naranja);
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .seccion-numero {
+    background: var(--naranja);
+    color: #fff;
+    font-size: 9pt;
+    font-weight: 700;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Resumen ejecutivo ── */
+  .resumen-box {
+    background: var(--gris-claro);
+    border-left: 4px solid var(--naranja);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 10.5pt;
+    line-height: 1.7;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .kpi {
+    background: var(--azul);
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .kpi-val {
+    font-size: 26pt;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--naranja2);
+  }
+
+  .kpi-lbl {
+    font-size: 8pt;
+    margin-top: 4px;
+    opacity: .85;
+    line-height: 1.3;
+  }
+
+  /* ── Tablas ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin-bottom: 8px;
+  }
+
+  thead tr {
+    background: var(--azul);
+    color: #fff;
+  }
+
+  thead th {
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 9pt;
+    letter-spacing: .3px;
+  }
+
+  tbody tr:nth-child(even) {
+    background: var(--gris-claro);
+  }
+
+  tbody tr:nth-child(odd) {
+    background: #fff;
+  }
+
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--borde);
+    vertical-align: top;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 8pt;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .badge-ok     { background: #dcfce7; color: var(--ok); }
+  .badge-warn   { background: #fef3c7; color: var(--warn); }
+  .badge-danger { background: #fee2e2; color: var(--danger); }
+
+  .risk-alto   { color: var(--danger); font-weight: 700; }
+  .risk-medio  { color: var(--warn);  font-weight: 600; }
+  .risk-bajo   { color: var(--ok);    font-weight: 600; }
+
+  /* ── Nota al pie de tabla ── */
+  .nota {
+    font-size: 8.5pt;
+    color: var(--gris);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ── Alerta ── */
+  .alerta {
+    background: #fef9ec;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 9.5pt;
+    color: #78350f;
+    margin: 16px 0;
+  }
+
+  /* ── Encabezado de página interior ── */
+  .header-pagina {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 28px;
+    font-size: 8.5pt;
+    color: var(--gris);
+  }
+
+  .header-pagina strong {
+    color: var(--naranja);
+    font-weight: 700;
+  }
+
+  /* ── Pie de página ── */
+  .footer-pagina {
+    margin-top: 40px;
+    padding-top: 10px;
+    border-top: 1px solid var(--borde);
+    font-size: 8pt;
+    color: var(--gris);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 9.5pt; }
+    .page { padding: 30px 40px; }
+    .portada { min-height: auto; page-break-after: always; }
+    .salto { page-break-before: always; }
+    .no-salto { page-break-inside: avoid; }
+    @page {
+      size: Letter;
+      margin: 18mm 16mm;
+    }
+    @page :first { margin: 0; }
+  }
+
+  /* ── Pantalla ── */
+  @media screen {
+    body { background: #e2e8f0; }
+    .page { background: #fff; margin: 24px auto; box-shadow: 0 4px 32px rgba(0,0,0,.15); border-radius: 4px; }
+    .portada { min-height: 900px; }
+    .btn-imprimir {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--naranja); color: #fff;
+      border: none; border-radius: 50px; padding: 14px 28px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(232,73,15,.4);
+      font-family: inherit;
+      z-index: 999;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-imprimir:hover { background: #c73d0a; }
+  }
+</style>
+</head>
+<body>
+
+<button class="btn-imprimir" onclick="window.print()">🖨️ Guardar como PDF</button>
+
+<!-- ══════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════ -->
+<div class="page portada">
+
+  <div class="portada-header">
+    <div>
+      <div class="portada-logo-text">Movimiento Ciudadano</div>
+      <div class="portada-logo-sub">Secretaría Nacional de Organización</div>
+    </div>
+    <div class="portada-clasificacion">CONFIDENCIAL — USO INTERNO</div>
+  </div>
+
+  <div class="portada-centro">
+    <div class="portada-escudo">🛡️</div>
+    <div class="portada-tipo">Informe Técnico de Seguridad</div>
+    <h1 class="portada-titulo">Seguridad y Protección<br>de Datos — CRM TerritoriOp</h1>
+    <p class="portada-subtitulo">Implementaciones, controles y cumplimiento normativo</p>
+    <div class="portada-linea"></div>
+    <div class="portada-meta">
+      <div class="portada-meta-item">
+        <strong>Mayo 2026</strong>
+        Fecha de emisión
+      </div>
+      <div class="portada-meta-item">
+        <strong>v15.0 — v15.28</strong>
+        Versiones auditadas
+      </div>
+      <div class="portada-meta-item">
+        <strong>23 medidas</strong>
+        Controles implementados
+      </div>
+      <div class="portada-meta-item">
+        <strong>LFPDPPP · INE</strong>
+        Marco normativo
+      </div>
+    </div>
+  </div>
+
+  <div class="portada-pie">
+    <div class="portada-firmas">
+      <div class="firma">
+        <div class="firma-linea"></div>
+        <div class="firma-nombre">Alfonso Vidales Vargas Ochoa</div>
+        <div class="firma-cargo">Secretario Nacional de Organización<br>Movimiento Ciudadano</div>
+      </div>
+      <div class="firma">
+        <div class="firma-linea"></div>
+        <div class="firma-nombre">Manuel Morales Carballo</div>
+        <div class="firma-cargo">Desarrollador del Proyecto<br>TerritoriOp CRM</div>
+      </div>
+    </div>
+    <div class="portada-folio">
+      Folio: MC-SEG-2026-001<br>
+      Ciudad de México, 15 de mayo de 2026
+    </div>
+  </div>
+
+</div><!-- /portada -->
+
+
+<!-- ══════════════════════════════════════════
+     CUERPO DEL INFORME
+══════════════════════════════════════════ -->
+<div class="page salto">
+
+  <div class="header-pagina">
+    <strong>TerritoriOp CRM — Informe de Seguridad</strong>
+    <span>Movimiento Ciudadano · Confidencial · Mayo 2026</span>
+  </div>
+
+  <!-- RESUMEN EJECUTIVO -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">I</span>
+      Resumen Ejecutivo
+    </div>
+    <div class="resumen-box">
+      El sistema <strong>TerritoriOp CRM</strong> ha sido sometido a un proceso continuo de auditoría y fortalecimiento de seguridad con el objetivo de proteger los datos personales de los integrantes de los Círculos Ciudadanos, dar cumplimiento a la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> y mitigar el riesgo de sanciones por parte del <strong>Instituto Nacional Electoral (INE)</strong> ante posibles reclamaciones de datos.<br><br>
+      El presente informe documenta las <strong>23 medidas de seguridad</strong> implementadas durante el período de desarrollo correspondiente a las versiones <strong>v15.0 a v15.28</strong>, organizadas por categoría de riesgo y área de protección.
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-val">23</div>
+        <div class="kpi-lbl">Controles de seguridad implementados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">6</div>
+        <div class="kpi-lbl">Categorías de protección cubiertas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">0</div>
+        <div class="kpi-lbl">Contraseñas en texto claro almacenadas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">100%</div>
+        <div class="kpi-lbl">Consultas BD con protección anti-inyección</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN II: TRÁNSITO -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">II</span>
+      Protección de Datos en Tránsito
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:28%">Medida</th><th>Descripción técnica</th><th style="width:12%">Estatus</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>HTTPS obligatorio</strong></td>
+          <td>Toda comunicación entre el usuario y el servidor está cifrada mediante TLS. El sistema redirige automáticamente cualquier acceso HTTP a HTTPS, garantizando que los datos personales nunca viajen en texto claro.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>CORS restringido</strong></td>
+          <td>El servidor solo acepta solicitudes del mismo dominio (<em>same-origin</em>). Se rechazan peticiones de dominios externos, bloqueando ataques de tipo Cross-Site Request Forgery desde sitios de terceros.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Headers HTTP de seguridad</strong></td>
+          <td><code>X-Content-Type-Options: nosniff</code> evita que el navegador interprete archivos maliciosos. <code>X-Frame-Options: DENY</code> previene ataques de clickjacking. <code>Content-Type</code> con charset explícito previene inyección de caracteres.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Cookies de sesión seguras</strong></td>
+          <td>Las cookies llevan los flags <code>HttpOnly</code> (JavaScript no puede leerlas), <code>SameSite: Strict</code> (no se envían en peticiones cruzadas) y <code>Secure</code> (solo viajan por HTTPS). Protege contra robo de sesión (session hijacking).</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Content Security Policy (CSP)</strong></td>
+          <td>La aplicación define qué fuentes de scripts, estilos e imágenes son permitidas. Scripts de dominios no autorizados son bloqueados por el navegador antes de ejecutarse, previniendo ataques XSS basados en CDN comprometidos.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN III: AUTENTICACIÓN -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">III</span>
+      Autenticación y Control de Acceso
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:28%">Medida</th><th>Descripción técnica</th><th style="width:12%">Estatus</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Contraseñas con bcrypt</strong></td>
+          <td>Las contraseñas se almacenan con el algoritmo bcrypt (factor de costo 12, estándar de la industria). Las contraseñas antiguas en texto plano se migran automáticamente a bcrypt en el primer inicio de sesión. Jamás se almacena ni transmite la contraseña original.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Control de roles (RBAC)</strong></td>
+          <td>Sistema de 3 niveles jerárquicos verificados en servidor: (1) Alto Mando nacional con capacidad de borrado, (2) Lectura nacional sin borrado, (3) Roles operativos por estado y municipio. Cada solicitud verifica rol y sesión antes de ejecutar cualquier acción.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Acceso a datos por nivel geográfico</strong></td>
+          <td>Cada rol solo puede ver los datos de su jurisdicción. Un coordinador estatal de Jalisco no puede acceder a datos de Nuevo León. La verificación se realiza en servidor, independientemente del estado del navegador del usuario.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Bloqueo temporal de cuentas</strong></td>
+          <td>Los administradores pueden suspender cualquier cuenta comprometida o inactiva. La cuenta bloqueada recibe una respuesta 403 (Prohibido) en toda operación, incluso si mantiene una sesión activa, siendo efectiva de inmediato.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Cierre de sesión forzado</strong></td>
+          <td>Desde la Consola Administrativa se puede cerrar la sesión de <em>todos</em> los usuarios simultáneamente ante una brecha de seguridad. La señal se distribuye a cada cliente conectado en el siguiente ciclo de heartbeat (≤20 segundos).</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Validación de sesión por petición</strong></td>
+          <td>El servidor verifica la validez de la sesión en cada llamada a la API, no únicamente en el login inicial. Una sesión expirada o inválida devuelve código HTTP 401 y limpia el estado local del cliente automáticamente.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-pagina">
+    <span>TerritoriOp CRM — Informe de Seguridad y Protección de Datos · Mayo 2026</span>
+    <span>Folio: MC-SEG-2026-001 · Página 2</span>
+  </div>
+
+</div><!-- /page 2 -->
+
+
+<!-- ══════════════ PÁGINA 3 ══════════════ -->
+<div class="page salto">
+
+  <div class="header-pagina">
+    <strong>TerritoriOp CRM — Informe de Seguridad</strong>
+    <span>Movimiento Ciudadano · Confidencial · Mayo 2026</span>
+  </div>
+
+  <!-- SECCIÓN IV: PREVENCIÓN DE ATAQUES -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">IV</span>
+      Prevención de Ataques Técnicos
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:28%">Medida</th><th>Descripción técnica</th><th style="width:12%">Estatus</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Consultas parametrizadas (PDO)</strong></td>
+          <td>El 100% de las interacciones con la base de datos utiliza sentencias preparadas (<em>PDO prepared statements</em>). Esto hace técnicamente imposible la inyección SQL, el ataque más común y destructivo contra bases de datos en aplicaciones web.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Protección XSS</strong></td>
+          <td>Las entradas de usuario se sanitizan antes de almacenarse y se codifican en HTML al mostrarse (<code>htmlspecialchars</code>). Previene que un atacante inyecte scripts maliciosos que se ejecuten en el navegador de otros usuarios.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Supresión de errores en producción</strong></td>
+          <td><code>display_errors = 0</code> en toda la aplicación. Los errores de PHP nunca son visibles al usuario final, eliminando la posibilidad de que un atacante obtenga información sobre rutas, versiones o estructura interna del sistema.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Captura de errores fatales</strong></td>
+          <td>Se implementó un <code>register_shutdown_function</code> que atrapa errores fatales de PHP —fuera del alcance de bloques try/catch— y devuelve una respuesta JSON controlada, sin exponer rutas de servidor, versiones o mensajes de depuración al cliente.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Buffering de salida controlado</strong></td>
+          <td>Toda la salida del servidor pasa por <code>ob_start()</code>. Si ocurre cualquier error en el procesamiento, el buffer se limpia antes de responder al cliente, garantizando que nunca se mezcle HTML de error con datos JSON.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN V: AUDITORÍA -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">V</span>
+      Auditoría y Trazabilidad
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:28%">Medida</th><th>Descripción técnica</th><th style="width:12%">Estatus</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Bitácora de acciones del sistema</strong></td>
+          <td>Cada acción relevante queda registrada en la tabla <code>audit_log</code> con: actor, acción realizada, objetivo, dirección IP y marca de tiempo. Cubre: inicio de sesión, cierre de sesión, creación, edición y eliminación de usuarios y círculos, cambios de rol y resets de contraseña.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Registro de IP por acceso</strong></td>
+          <td>La dirección IP de cada usuario se almacena en cada inicio de sesión (campo <code>ultima_ip</code>). Permite identificar accesos desde ubicaciones inusuales o no autorizadas para fines de auditoría.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Cola de aprobación para borrados</strong></td>
+          <td>Los datos personales no pueden eliminarse directamente por roles intermedios. Se genera una solicitud de borrado que requiere aprobación explícita de un administrador de Alto Mando, creando un registro de doble verificación conforme a principios de minimización de datos.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Historial de actividad por usuario</strong></td>
+          <td>Los administradores pueden consultar el historial completo de acciones de cualquier usuario desde el Panel de Control, facilitando la detección temprana de comportamientos anómalos o accesos no autorizados.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN VI: ADMINISTRACIÓN -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">VI</span>
+      Administración y Continuidad Operativa
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:28%">Medida</th><th>Descripción técnica</th><th style="width:12%">Estatus</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Modo Mantenimiento</strong></td>
+          <td>Permite activar operación restringida durante actualizaciones del sistema, con dos niveles: <em>Banner informativo</em> (usuarios siguen operando con aviso) o <em>Bloqueo total</em> (solo administradores). El estado se distribuye en tiempo real a todos los usuarios conectados vía heartbeat, sin reiniciar el servidor.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Consola Administrativa Out-of-Band</strong></td>
+          <td>Panel de administración independiente con acceso por URL no vinculada al CRM. Protegida por: token maestro de 32 caracteres, lista blanca de IPs con soporte CIDR y wildcards, protección CSRF, rate limiting (máx. 5 intentos / 15 min), sesión PHP separada y registro de cada acceso en bitácora. Permite actuar ante emergencias sin depender del login del CRM.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Migraciones automáticas de BD</strong></td>
+          <td>El sistema aplica automáticamente parches de base de datos al iniciar (nuevas columnas, nuevas tablas, sincronización de datos históricos), eliminando ventanas de vulnerabilidad por esquemas desactualizados entre versiones del sistema.</td>
+          <td><span class="badge badge-ok">✓ Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-pagina">
+    <span>TerritoriOp CRM — Informe de Seguridad y Protección de Datos · Mayo 2026</span>
+    <span>Folio: MC-SEG-2026-001 · Página 3</span>
+  </div>
+
+</div><!-- /page 3 -->
+
+
+<!-- ══════════════ PÁGINA 4 ══════════════ -->
+<div class="page salto">
+
+  <div class="header-pagina">
+    <strong>TerritoriOp CRM — Informe de Seguridad</strong>
+    <span>Movimiento Ciudadano · Confidencial · Mayo 2026</span>
+  </div>
+
+  <!-- SECCIÓN VII: DATOS PERSONALES -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">VII</span>
+      Protección de Datos Personales — LFPDPPP e INE
+    </div>
+    <p style="margin-bottom:14px;font-size:10pt;color:var(--gris);">
+      Los datos recopilados por el CRM incluyen información de carácter sensible sujeta a la LFPDPPP y a los lineamientos del INE en materia de protección de datos del padrón electoral. A continuación se detallan los controles específicos por tipo de dato:
+    </p>
+    <table>
+      <thead>
+        <tr><th style="width:22%">Dato personal</th><th style="width:38%">Medida de protección</th><th>Fundamento normativo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Contraseñas de acceso</strong></td>
+          <td>Almacenadas exclusivamente con hash bcrypt. Nunca en texto claro. Migración automática de registros históricos.</td>
+          <td>Art. 19 LFPDPPP — Medidas de seguridad técnicas</td>
+        </tr>
+        <tr>
+          <td><strong>Nombre completo</strong></td>
+          <td>Accesible únicamente por usuarios con rol y jurisdicción correspondiente. Verificación server-side en cada petición.</td>
+          <td>Art. 7 LFPDPPP — Principio de finalidad</td>
+        </tr>
+        <tr>
+          <td><strong>CURP</strong></td>
+          <td>Almacenada dentro del JSON de cada círculo, no expuesta en índices ni búsquedas abiertas. Solo visible por el coordinador del círculo y administradores.</td>
+          <td>Art. 3, fr. VI LFPDPPP — Dato personal sensible</td>
+        </tr>
+        <tr>
+          <td><strong>Fotografía personal</strong></td>
+          <td>Almacenada en servidor con acceso restringido por ruta. No indexada públicamente. Herramienta de compresión para minimizar volumen almacenado.</td>
+          <td>Art. 3, fr. VI LFPDPPP — Imagen como dato biométrico</td>
+        </tr>
+        <tr>
+          <td><strong>Credencial de elector (INE)</strong></td>
+          <td>Imagen comprimida almacenada en servidor privado. Acceso restringido por nivel de rol. No transmitida a terceros.</td>
+          <td>Lineamientos INE — Protección de datos del padrón</td>
+        </tr>
+        <tr>
+          <td><strong>Datos electorales (sección, municipio)</strong></td>
+          <td>Accesibles solo por roles con jurisdicción geográfica correspondiente. Un operador estatal no puede ver datos de otro estado.</td>
+          <td>Art. 7 LFPDPPP — Principio de proporcionalidad</td>
+        </tr>
+        <tr>
+          <td><strong>Dirección IP del usuario</strong></td>
+          <td>Registrada para fines de auditoría de seguridad y detección de accesos no autorizados. No compartida con terceros.</td>
+          <td>Art. 8 LFPDPPP — Consentimiento y finalidad</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alerta" style="margin-top:16px;">
+      ⚠️ <strong>Punto de atención:</strong> El Aviso de Privacidad del sistema se encuentra pendiente de aprobación por el Secretario Nacional. Su publicación es un requerimiento legal directo conforme al Art. 15 de la LFPDPPP y debe atenderse a la brevedad para completar el cumplimiento normativo.
+    </div>
+  </div>
+
+  <!-- SECCIÓN VIII: RIESGOS RESIDUALES -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">VIII</span>
+      Riesgos Residuales y Plan de Acción
+    </div>
+    <table>
+      <thead>
+        <tr><th style="width:30%">Riesgo identificado</th><th style="width:12%">Nivel</th><th>Acción recomendada</th><th style="width:14%">Plazo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Aviso de Privacidad no publicado en el sistema</td>
+          <td><span class="risk-alto">🔴 Alto</span></td>
+          <td>Aprobar texto legal y publicar en la pantalla de login del CRM. Requerimiento directo de la LFPDPPP Art. 15.</td>
+          <td>Inmediato</td>
+        </tr>
+        <tr>
+          <td>Sin backup automático programado de la base de datos</td>
+          <td><span class="risk-medio">🟡 Medio</span></td>
+          <td>Implementar respaldo diario automatizado (<em>mysqldump</em> o equivalente) a servidor externo o almacenamiento en la nube.</td>
+          <td>Corto plazo</td>
+        </tr>
+        <tr>
+          <td>Autenticación de un solo factor para roles de Alto Mando</td>
+          <td><span class="risk-medio">🟡 Medio</span></td>
+          <td>Implementar autenticación de dos factores (2FA por TOTP o SMS) para roles superadmin, secretario_nacional y coordinador_nacional.</td>
+          <td>Mediano plazo</td>
+        </tr>
+        <tr>
+          <td>Librería OCR (Tesseract.js) en versión 4 desactualizada</td>
+          <td><span class="risk-bajo">🟢 Bajo</span></td>
+          <td>Actualizar a Tesseract.js v5 en la siguiente ventana de mantenimiento programado.</td>
+          <td>Largo plazo</td>
+        </tr>
+        <tr>
+          <td>Sin monitoreo automatizado de disponibilidad del servidor</td>
+          <td><span class="risk-medio">🟡 Medio</span></td>
+          <td>Configurar alertas automáticas (uptime monitor) para notificar caídas del servicio en tiempo real a los administradores.</td>
+          <td>Mediano plazo</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN IX: CONCLUSIONES -->
+  <div class="seccion no-salto">
+    <div class="seccion-titulo">
+      <span class="seccion-numero">IX</span>
+      Conclusiones
+    </div>
+    <div class="resumen-box">
+      El sistema TerritoriOp CRM cuenta actualmente con una arquitectura de seguridad robusta que cubre las principales categorías de riesgo: cifrado en tránsito, autenticación segura, control de acceso granular por rol y jurisdicción geográfica, prevención de los ataques más comunes (inyección SQL, XSS, CSRF, session hijacking), trazabilidad completa de acciones y herramientas de administración fuera de banda para respuesta a incidentes.<br><br>
+      La implementación de las <strong>23 medidas documentadas</strong> reduce significativamente el riesgo de exposición de datos personales y coloca al sistema en una posición de cumplimiento sustancial con los principios de la LFPDPPP. La atención prioritaria al <strong>Aviso de Privacidad</strong> pendiente completará el marco normativo requerido.<br><br>
+      Se recomienda establecer un ciclo de auditoría trimestral para revisar nuevas vulnerabilidades y mantener el sistema actualizado conforme evolucionen las amenazas y el marco regulatorio del INE en materia de datos del padrón electoral.
+    </div>
+  </div>
+
+  <!-- FIRMAS FINALES -->
+  <div style="margin-top:48px;page-break-inside:avoid;">
+    <p style="font-size:9pt;color:var(--gris);margin-bottom:32px;text-align:center;">
+      Ciudad de México, a 15 de mayo de 2026
+    </p>
+    <div style="display:flex;justify-content:space-around;gap:40px;">
+      <div class="firma" style="min-width:220px;">
+        <div style="height:48px;"></div>
+        <div class="firma-linea"></div>
+        <div class="firma-nombre">Alfonso Vidales Vargas Ochoa</div>
+        <div class="firma-cargo">Secretario Nacional de Organización<br>Movimiento Ciudadano</div>
+      </div>
+      <div class="firma" style="min-width:220px;">
+        <div style="height:48px;"></div>
+        <div class="firma-linea"></div>
+        <div class="firma-nombre">Manuel Morales Carballo</div>
+        <div class="firma-cargo">Desarrollador del Proyecto<br>TerritoriOp CRM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-pagina" style="margin-top:36px;">
+    <span>TerritoriOp CRM — Informe de Seguridad y Protección de Datos · Mayo 2026</span>
+    <span>Folio: MC-SEG-2026-001 · Página 4 de 4</span>
+  </div>
+
+</div><!-- /page 4 -->
+
+</body>
+</html>

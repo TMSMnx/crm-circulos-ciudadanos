@@ -1,0 +1,10 @@
+# Bloquear ejecución de PHP y scripts en la carpeta de subidas.
+# Un atacante que suba un archivo .php no podrá ejecutarlo.
+
+<FilesMatch "\.php[0-9]?$|\.phtml$|\.pl$|\.py$|\.cgi$|\.sh$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+Options -ExecCGI -Indexes
+AddHandler cgi-script .php .php3 .php4 .php5 .php7 .php8 .phtml .pl .py .cgi .sh

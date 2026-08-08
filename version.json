@@ -1,0 +1,6 @@
+{
+    "version": "2.2.0",
+    "build": "2026-01-25-VALIDACION",
+    "date": "25 de Enero de 2026",
+    "notes": "Implementación de Mesa de Control, Rol de Validación, Semáforos de Estado (Verde/Rojo) y Bloqueo de Auto-validación."
+}

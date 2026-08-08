@@ -1,0 +1,20 @@
+{
+  "name": "CRM Círculos Ciudadanos",
+  "short_name": "CRM Ciudadano",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff7e00",
+  "icons": [
+    {
+      "src": "img/circulos.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "img/circulos.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

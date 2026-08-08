@@ -1,0 +1,18 @@
+=========================================
+BITÁCORA DE CAMBIOS - CRM CÍRCULOS CIUDADANOS
+=========================================
+
+[v2.1.2] - 2026-01-24
+- SEGURIDAD CRÍTICA: Credenciales de BD movidas a entorno externo seguro.
+- CORRECCIÓN API: Manejo de errores fatales por duplicidad de usuarios (evita Error 500).
+- OPTIMIZACIÓN FRONTEND: Validación estricta en formularios para prevenir registros vacíos.
+- GEO-REFERENCIACIÓN: Verificación de candados HTTPS para uso de GPS.
+
+[v2.1.1] - 2026-01-24
+- Agregado sistema de control de versiones incremental.
+- Visualización de versión en la pantalla de login.
+- Creación de archivo version.json para gestión centralizada.
+
+[v2.1.0] - 2026-01-19
+- Ajustes en el motor de OCR para credenciales tipo E.
+- Mejora en la generación de reportes PDF por sectores.
