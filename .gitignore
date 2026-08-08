@@ -1,0 +1,35 @@
+# --- Basura del sistema operativo ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# --- Conflictos de sincronización de OneDrive ---
+*-DESKTOP-*.*
+*[Cc]onflicted copy*
+*copia en conflicto*
+
+# --- Editores ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Secretos: NUNCA versionar ---
+# El conector real vive FUERA de public_html (ver db.php).
+# Estas reglas son un cinturón de seguridad por si algún día se copia aquí.
+secrets.php
+*_secrets.php
+.env
+.env.*
+!.env.example
+
+# --- Datos personales: NUNCA versionar en repos nuevos ---
+# (En este archivo forense los CSV originales ya quedaron en el commit
+#  pristino a propósito; estas reglas evitan que se agreguen MÁS.)
+uploads/*
+!uploads/.htaccess
+*.sql
+*.sql.gz
+backup_*.zip

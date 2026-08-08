@@ -253,7 +253,8 @@
       "Bash(grep -rnoE \"\\(password|passwd|pwd|secret|token|api_key|apikey\\)\\\\s*[=:]\\\\s*['\\\\\"][^'\\\\\"]{4,}['\\\\\"]\" --include=\"*.php\" --include=\"*.js\" --include=\"*.json\" .)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git commit -q -m 'Backup pristino v15.29 - estado tal como se descargo de cPanel \\(25 abr 2026\\) *)"
+      "Bash(git commit -q -m 'Backup pristino v15.29 - estado tal como se descargo de cPanel \\(25 abr 2026\\) *)",
+      "Bash(echo \"autocrlf global: $\\(git config --global core.autocrlf\\) | local: $\\(git config core.autocrlf\\)\")"
     ]
   }
 }
