@@ -271,7 +271,8 @@
       "WebFetch(domain:www.burodecredito.com.mx)",
       "WebFetch(domain:www.diputados.gob.mx)",
       "Bash(python -m pytest -q)",
-      "Bash(python caso_manx.py)"
+      "Bash(python caso_manx.py)",
+      "Bash(python escenario_oaxtepec.py)"
     ]
   }
 }
