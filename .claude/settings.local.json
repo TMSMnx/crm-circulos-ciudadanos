@@ -272,7 +272,11 @@
       "WebFetch(domain:www.diputados.gob.mx)",
       "Bash(python -m pytest -q)",
       "Bash(python caso_manx.py)",
-      "Bash(python escenario_oaxtepec.py)"
+      "Bash(python escenario_oaxtepec.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(PYTHONIOENCODING=utf-8 python escenario_oaxtepec.py)",
+      "Bash(sed -n '/2. LA CARRERA/,/^$/p;/3. QUE QUEDA/,/4. LO QUE/p')",
+      "Bash(python -c \"import json;json.load\\(open\\('.claude/settings.local.json',encoding='utf-8'\\)\\);print\\('JSON valido'\\)\")"
     ]
   }
 }
