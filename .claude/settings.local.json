@@ -267,7 +267,11 @@
       "Bash(git commit -q -m 'Extractor de INE con salida estructurada y arnes de evaluacion *)",
       "Bash(grep -E \"\\\\.env$|\\\\.jpg$|data/\")",
       "Bash(python -c \"import openpyxl; print\\(openpyxl.__version__\\)\")",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebFetch(domain:www.burodecredito.com.mx)",
+      "WebFetch(domain:www.diputados.gob.mx)",
+      "Bash(python -m pytest -q)",
+      "Bash(python caso_manx.py)"
     ]
   }
 }
