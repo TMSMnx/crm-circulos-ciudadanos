@@ -254,7 +254,20 @@
       "Bash(git init *)",
       "Bash(git add *)",
       "Bash(git commit -q -m 'Backup pristino v15.29 - estado tal como se descargo de cPanel \\(25 abr 2026\\) *)",
-      "Bash(echo \"autocrlf global: $\\(git config --global core.autocrlf\\) | local: $\\(git config core.autocrlf\\)\")"
+      "Bash(echo \"autocrlf global: $\\(git config --global core.autocrlf\\) | local: $\\(git config core.autocrlf\\)\")",
+      "Bash(python -m pip --version)",
+      "Bash(python -m pip list)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(touch src/__init__.py src/providers/__init__.py evals/__init__.py tools/__init__.py)",
+      "Bash(printf 'anthropic>=0.70\\\\npillow>=11\\\\npytest>=8\\\\n')",
+      "Bash(printf '# Copia este archivo como .env y pon tu llave real.\\\\n# NUNCA subas el .env: .gitignore ya lo bloquea.\\\\nANTHROPIC_API_KEY=sk-ant-...\\\\n\\\\n# Pon 0 si tu cuenta no tiene habilitado el beta de fallbacks del servidor.\\\\nANTHROPIC_FALLBACKS=1\\\\n')",
+      "Bash(python -m tools.gen_synthetic --cantidad 40)",
+      "Bash(python -m evals.run_evals)",
+      "Bash(git commit -q -m 'Extractor de INE con salida estructurada y arnes de evaluacion *)",
+      "Bash(grep -E \"\\\\.env$|\\\\.jpg$|data/\")",
+      "Bash(python -c \"import openpyxl; print\\(openpyxl.__version__\\)\")",
+      "Bash(git commit *)"
     ]
   }
 }
