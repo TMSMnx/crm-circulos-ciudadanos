@@ -277,7 +277,21 @@
       "Bash(PYTHONIOENCODING=utf-8 python escenario_oaxtepec.py)",
       "Bash(sed -n '/2. LA CARRERA/,/^$/p;/3. QUE QUEDA/,/4. LO QUE/p')",
       "Bash(python -c \"import json;json.load\\(open\\('.claude/settings.local.json',encoding='utf-8'\\)\\);print\\('JSON valido'\\)\")",
-      "Read(//c/Program Files/Google/Chrome/Application/**)"
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Bash(ls -la \"/d/OneDrive/A TMS/ALIEX\" 2>/dev/null || echo \"no\")",
+      "Bash(mkdir -p '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/parejas' '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/anillos')",
+      "Bash(cp '/d/OneDrive/A TMS/ALIEX/Crafted Masonic Goods CMG/sitio-web/assets/boda/boda-1.png' '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/parejas/pareja-1.png')",
+      "Bash(cp '/d/OneDrive/A TMS/ALIEX/Crafted Masonic Goods CMG/sitio-web/assets/boda/boda-2.png' '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/parejas/pareja-2.png')",
+      "Bash(cp '/d/OneDrive/A TMS/ALIEX/Crafted Masonic Goods CMG/sitio-web/assets/boda/boda-3.png' '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/parejas/pareja-3.png')",
+      "Bash(cp '/d/OneDrive/A TMS/ALIEX/Crafted Masonic Goods CMG/sitio-web/assets/boda/boda-4.png' '/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/sitio-web/assets/parejas/pareja-4.png')",
+      "Bash(sed -i 's/--red:#e2564f;/--red:#c96060;/' \"/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/crm/assets/style.css\" && grep -n \"^:root\" \"/d/OneDrive/A TMS/ALIEX/Crafted Goods Co/crm/assets/style.css\")",
+      "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=duo-negro-oro\" -F \"talla=9½\" -F \"talla2=6\" -F \"grabado=Ana & Luis 12-10-2026\" -F \"entrega=moto\" -F \"nombre=Ana Ruiz\" -F \"telefono=5512345678\" -F \"ciudad=CDMX\" -F \"elapsed=9.1\")",
+      "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=g33\" -F \"nombre=X\" -F \"telefono=5512345678\" -F \"elapsed=9\")",
+      "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=band-negro\" -F \"nombre=X\" -F \"telefono=123\" -F \"elapsed=9\")",
+      "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=grabado\" -F \"nombre=Beto Sol\" -F \"telefono=5598765432\" -F \"entrega=paqueteria\" -F \"elapsed=9\")",
+      "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=band-negro\" -F \"nombre=bot\" -F \"telefono=5511111111\" -F \"website=spam\" -F \"elapsed=9\")",
+      "Bash(curl -s -o /dev/null http://localhost:8081/)",
+      "Bash(curl -s \"http://localhost:8081/?shutdown\" -o /dev/null --max-time 2)"
     ]
   }
 }
