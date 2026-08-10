@@ -1,6 +1,39 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "PowerShell(Remove-Item -Recurse -Force*)"
+    ],
     "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "Bash(npm ls *)",
+      "Bash(npm install *)",
+      "Bash(pip install *)",
+      "Bash(pip show *)",
+      "Bash(ls *)",
+      "Bash(mkdir -p *)",
+      "Bash(wc *)",
+      "Bash(cp *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git branch*)",
+      "Bash(git show*)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-Command *)",
       "Bash(Get-Item \"D:\\\\OneDrive\\\\A Movimiento Ciudadano\\\\A CIRCULOS CIUDADANOS\\\\A CRM\\\\BCKP\\\\CRM25ABR2026\\\\public_html\\\\js\\\\pdf-engine.js\")",
       "Bash(Select-Object Name, Length, LastWriteTime)",
       "Bash(powershell -ExecutionPolicy Bypass -File \"D:\\\\OneDrive\\\\A Movimiento Ciudadano\\\\A CIRCULOS CIUDADANOS\\\\A CRM\\\\BCKP\\\\CRM25ABR2026\\\\public_html\\\\fix-encoding.ps1\")",
@@ -304,7 +337,11 @@
       "Bash(echo \"exit=$?\")",
       "Bash(PYTHONUTF8=1 python qa.py)",
       "Read(//c/Users/mnx77/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3999b645-950e-4919-a35c-5fb2a25d641f/1a2db8f4-fd02-4ab9-8325-204b872e849c/skills/pptx/**)",
-      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/office/validate.py \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\05-Presentacion-Ejecutiva.pptx\")"
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/office/validate.py \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\05-Presentacion-Ejecutiva.pptx\")",
+      "Bash(PYTHONUTF8=1 python verify2.py)",
+      "Bash(PYTHONUTF8=1 python test_panel.py)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ]
   }
 }
