@@ -291,7 +291,20 @@
       "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=grabado\" -F \"nombre=Beto Sol\" -F \"telefono=5598765432\" -F \"entrega=paqueteria\" -F \"elapsed=9\")",
       "Bash(curl -s -X POST http://localhost:8081/pedido.php -F \"producto=band-negro\" -F \"nombre=bot\" -F \"telefono=5511111111\" -F \"website=spam\" -F \"elapsed=9\")",
       "Bash(curl -s -o /dev/null http://localhost:8081/)",
-      "Bash(curl -s \"http://localhost:8081/?shutdown\" -o /dev/null --max-time 2)"
+      "Bash(curl -s \"http://localhost:8081/?shutdown\" -o /dev/null --max-time 2)",
+      "Bash(python build_model.py)",
+      "Read(//c/Users/mnx77/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3999b645-950e-4919-a35c-5fb2a25d641f/1a2db8f4-fd02-4ab9-8325-204b872e849c/skills/xlsx/**)",
+      "Bash(python scripts/recalc.py \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\03-Modelo-Financiero.xlsx\" 120)",
+      "PowerShell($p = @\\(\"C:\\\\Program Files\\\\LibreOffice\\\\program\\\\soffice.exe\",\"C:\\\\Program Files \\(x86\\)\\\\LibreOffice\\\\program\\\\soffice.exe\"\\); foreach \\($x in $p\\) { if \\(Test-Path $x\\) { Write-Output \"FOUND: $x\" } }; $c = Get-Command soffice -ErrorAction SilentlyContinue; if \\($c\\) { Write-Output \"PATH: $\\($c.Source\\)\" } else { Write-Output \"not on PATH\" })",
+      "Bash(python verify.py)",
+      "Bash(npm ls *)",
+      "Bash(node build_deck.js)",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 markitdown \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\05-Presentacion-Ejecutiva.pptx\")",
+      "Bash(PYTHONUTF8=1 markitdown \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\05-Presentacion-Ejecutiva.pptx\")",
+      "Bash(echo \"exit=$?\")",
+      "Bash(PYTHONUTF8=1 python qa.py)",
+      "Read(//c/Users/mnx77/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3999b645-950e-4919-a35c-5fb2a25d641f/1a2db8f4-fd02-4ab9-8325-204b872e849c/skills/pptx/**)",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/office/validate.py \"D:\\\\OneDrive\\\\A TMS\\\\A TM SYSTEMS\\\\CLAUDE CODE PROYECTOS\\\\Armada Colombia - Covenas\\\\05-Presentacion-Ejecutiva.pptx\")"
     ]
   }
 }
