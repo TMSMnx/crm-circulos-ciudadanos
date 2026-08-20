@@ -339,7 +339,12 @@
       "Bash(git commit -m ' *)",
       "Bash(mkdir -p \"PANEL SNCC - TMSDevs/01 DOCS\" \"PANEL SNCC - TMSDevs/02 DATOS/FUENTES\" \"PANEL SNCC - TMSDevs/02 DATOS/CATALOGO TERRITORIAL\" \"PANEL SNCC - TMSDevs/03 LEGAL\" \"PANEL SNCC - TMSDevs/04 APP\")",
       "Bash(mv \"/d/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/Propuesta Panel SNCC.html\" \"PANEL SNCC - TMSDevs/01 DOCS/Propuesta Panel SNCC.html\")",
-      "Bash(PYTHONUTF8=1 python build_catalogo.py)"
+      "Bash(PYTHONUTF8=1 python build_catalogo.py)",
+      "Bash(mkdir -p \"/d/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/ADM/PANEL SNCC - TMSDevs/02 DATOS/CATALOGO TERRITORIAL/raw\")",
+      "Bash(curl -sS --max-time 550 -o MGS_CCL_SHAPEFILE.7z -w \"descargado %{size_download} bytes en %{time_total}s\\\\n\" https://cartografia.ine.mx/mapoteca/MGS_CCL/SHAPEFILE.7z)",
+      "Bash(python -m pip install --quiet pyshp)",
+      "Bash(python -c \"import shapefile; print\\('pyshp OK', shapefile.__version__\\)\")",
+      "Bash(PYTHONUTF8=1 python -)"
     ],
     "deny": [
       "Bash(rm -rf *)",
