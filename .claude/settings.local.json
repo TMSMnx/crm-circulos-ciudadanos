@@ -1,14 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "acceptEdits",
-    "deny": [
-      "Bash(rm -rf *)",
-      "Bash(rm -fr *)",
-      "Bash(git push --force*)",
-      "Bash(git reset --hard*)",
-      "Bash(git clean -fd*)",
-      "PowerShell(Remove-Item -Recurse -Force*)"
-    ],
     "allow": [
       "Read",
       "Glob",
@@ -341,7 +332,20 @@
       "Bash(PYTHONUTF8=1 python verify2.py)",
       "Bash(PYTHONUTF8=1 python test_panel.py)",
       "Skill(update-config)",
-      "Skill(update-config:*)"
-    ]
+      "Skill(update-config:*)",
+      "Read(//c/Users/mnx77/AppData/Local/Temp/claude/D--OneDrive-A-Movimiento-Ciudadano-A-CIRCULOS-CIUDADANOS-A-CRM-BCKP-CRM25ABR2026-public-html/64d92944-fa17-43a1-81a9-c7f4896f719d/scratchpad/**)",
+      "Bash(mv inspect.py xl_scan.py)",
+      "Bash(python xl_scan.py)",
+      "Bash(git commit -m ' *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "PowerShell(Remove-Item -Recurse -Force*)"
+    ],
+    "defaultMode": "acceptEdits"
   }
 }
