@@ -336,7 +336,9 @@
       "Read(//c/Users/mnx77/AppData/Local/Temp/claude/D--OneDrive-A-Movimiento-Ciudadano-A-CIRCULOS-CIUDADANOS-A-CRM-BCKP-CRM25ABR2026-public-html/64d92944-fa17-43a1-81a9-c7f4896f719d/scratchpad/**)",
       "Bash(mv inspect.py xl_scan.py)",
       "Bash(python xl_scan.py)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(mkdir -p \"PANEL SNCC - TMSDevs/01 DOCS\" \"PANEL SNCC - TMSDevs/02 DATOS/FUENTES\" \"PANEL SNCC - TMSDevs/02 DATOS/CATALOGO TERRITORIAL\" \"PANEL SNCC - TMSDevs/03 LEGAL\" \"PANEL SNCC - TMSDevs/04 APP\")",
+      "Bash(mv \"/d/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/Propuesta Panel SNCC.html\" \"PANEL SNCC - TMSDevs/01 DOCS/Propuesta Panel SNCC.html\")"
     ],
     "deny": [
       "Bash(rm -rf *)",
