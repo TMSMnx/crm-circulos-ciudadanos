@@ -347,7 +347,8 @@
       "Bash(PYTHONUTF8=1 python -)",
       "Bash(PYTHONUTF8=1 python build_geojson.py)",
       "Bash(PYTHONUTF8=1 python build_preview_data.py)",
-      "Bash(python -m http.server 8731 --bind 127.0.0.1)"
+      "Bash(python -m http.server 8731 --bind 127.0.0.1)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='python.exe' OR Name='node.exe' OR Name='mapshaper.exe'\" | Select-Object ProcessId, Name, @{n='Iniciado';e={$_.CreationDate}}, @{n='CPUseg';e={[math]::Round\\($_.UserModeTime/10000000,1\\)}}, CommandLine | Format-List)"
     ],
     "deny": [
       "Bash(rm -rf *)",
