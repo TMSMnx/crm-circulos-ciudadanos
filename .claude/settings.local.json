@@ -344,7 +344,10 @@
       "Bash(curl -sS --max-time 550 -o MGS_CCL_SHAPEFILE.7z -w \"descargado %{size_download} bytes en %{time_total}s\\\\n\" https://cartografia.ine.mx/mapoteca/MGS_CCL/SHAPEFILE.7z)",
       "Bash(python -m pip install --quiet pyshp)",
       "Bash(python -c \"import shapefile; print\\('pyshp OK', shapefile.__version__\\)\")",
-      "Bash(PYTHONUTF8=1 python -)"
+      "Bash(PYTHONUTF8=1 python -)",
+      "Bash(PYTHONUTF8=1 python build_geojson.py)",
+      "Bash(PYTHONUTF8=1 python build_preview_data.py)",
+      "Bash(python -m http.server 8731 --bind 127.0.0.1)"
     ],
     "deny": [
       "Bash(rm -rf *)",
