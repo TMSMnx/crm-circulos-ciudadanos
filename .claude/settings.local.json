@@ -370,7 +370,9 @@
       "Bash(powershell -NoProfile -Command \"\\(Get-CimInstance Win32_Process -Filter \\\\\"Name='php.exe'\\\\\"\\).Count\")",
       "Bash(sed -i 's#^OUT=.*#OUT=r\"C:\\\\\\\\Users\\\\\\\\mnx77\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\D--OneDrive-A-Movimiento-Ciudadano-A-CIRCULOS-CIUDADANOS-A-CRM-BCKP-CRM25ABR2026-public-html\\\\\\\\004ac8b1-215d-4840-82b9-f2d937fafebd\\\\\\\\scratchpad\\\\\\\\Matriz roles y permisos - LLENA.xlsx\"#' fill_matriz_permisos.py)",
       "Bash(PYTHONUTF8=1 python fill_matriz_permisos.py)",
-      "Bash(PYTHONUTF8=1 python add_roles_faltantes.py)"
+      "Bash(PYTHONUTF8=1 python add_roles_faltantes.py)",
+      "Bash(PYTHONUTF8=1 python gen_reporte_funcional.py)",
+      "Bash(python -c \"import fitz; d=fitz.open\\(r'D:\\\\OneDrive\\\\Downloads\\\\Analisis_Funcional_CRM_NERV.pdf'\\); print\\('pags',d.page_count\\); [d[i].get_pixmap\\(dpi=95\\).save\\('rf_p%d.png'%\\(i+1\\)\\) for i in range\\(d.page_count\\)]\")"
     ],
     "deny": [
       "Bash(rm -rf *)",
