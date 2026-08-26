@@ -372,7 +372,8 @@
       "Bash(PYTHONUTF8=1 python fill_matriz_permisos.py)",
       "Bash(PYTHONUTF8=1 python add_roles_faltantes.py)",
       "Bash(PYTHONUTF8=1 python gen_reporte_funcional.py)",
-      "Bash(python -c \"import fitz; d=fitz.open\\(r'D:\\\\OneDrive\\\\Downloads\\\\Analisis_Funcional_CRM_NERV.pdf'\\); print\\('pags',d.page_count\\); [d[i].get_pixmap\\(dpi=95\\).save\\('rf_p%d.png'%\\(i+1\\)\\) for i in range\\(d.page_count\\)]\")"
+      "Bash(python -c \"import fitz; d=fitz.open\\(r'D:\\\\OneDrive\\\\Downloads\\\\Analisis_Funcional_CRM_NERV.pdf'\\); print\\('pags',d.page_count\\); [d[i].get_pixmap\\(dpi=95\\).save\\('rf_p%d.png'%\\(i+1\\)\\) for i in range\\(d.page_count\\)]\")",
+      "mcp__claude-in-chrome__tabs_close_mcp"
     ],
     "deny": [
       "Bash(rm -rf *)",
