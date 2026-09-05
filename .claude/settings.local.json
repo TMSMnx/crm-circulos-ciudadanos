@@ -379,7 +379,9 @@
       "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS/public_html\" && wc -l api.php app.html assets/js/*.js assets/css/*.css 2>&1)",
       "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS/public_html\" && grep -n \"case '\\\\|action ===\\\\|function \" api.php | head -80)",
       "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web/admin\" && ls -la && echo \"=== LINES ===\" && wc -l *.php)",
-      "Bash(git commit -m '@ *)"
+      "Bash(git commit -m '@ *)",
+      "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" && echo \"=== Referencias a /crm o crm/ ===\" && grep -rn \"/crm\\\\|crm/\\\\|'crm'\\\\|\\\\\"crm\\\\\"\" --include=*.php --include=*.js --include=*.json --include=*.html . 2>/dev/null | grep -v node_modules | head -40)",
+      "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web\" && echo \"=== El sitio publico enlaza al CRM? ===\" && grep -rn \"/crm\\\\|territops\\\\|TerriTOPS\\\\|Territops\" --include=*.html --include=*.php --include=*.js . 2>/dev/null | head -20 && echo \"\\(sin resultados = no hay enlace\\)\")"
     ],
     "deny": [
       "Bash(rm -rf *)",
