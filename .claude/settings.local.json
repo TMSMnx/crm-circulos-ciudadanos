@@ -373,7 +373,13 @@
       "Bash(PYTHONUTF8=1 python add_roles_faltantes.py)",
       "Bash(PYTHONUTF8=1 python gen_reporte_funcional.py)",
       "Bash(python -c \"import fitz; d=fitz.open\\(r'D:\\\\OneDrive\\\\Downloads\\\\Analisis_Funcional_CRM_NERV.pdf'\\); print\\('pags',d.page_count\\); [d[i].get_pixmap\\(dpi=95\\).save\\('rf_p%d.png'%\\(i+1\\)\\) for i in range\\(d.page_count\\)]\")",
-      "mcp__claude-in-chrome__tabs_close_mcp"
+      "mcp__claude-in-chrome__tabs_close_mcp",
+      "Read(//d/OneDrive/A TMS/PM DEVs/TERRITORIOP/**)",
+      "Read(//d/OneDrive/A TMS/PM DEVs/TERRITORIOP/public_html/**)",
+      "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS/public_html\" && wc -l api.php app.html assets/js/*.js assets/css/*.css 2>&1)",
+      "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS/public_html\" && grep -n \"case '\\\\|action ===\\\\|function \" api.php | head -80)",
+      "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web/admin\" && ls -la && echo \"=== LINES ===\" && wc -l *.php)",
+      "Bash(git commit -m '@ *)"
     ],
     "deny": [
       "Bash(rm -rf *)",
