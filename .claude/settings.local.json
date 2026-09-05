@@ -416,7 +416,10 @@
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" add .claude/settings.local.json)",
       "Bash(git -C 'D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html' commit -m ' *)",
       "Bash(ls \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/DB/DB 15MAY2026/\")",
-      "PowerShell(\\(Get-Item \"D:\\\\OneDrive\\\\A Movimiento Ciudadano\\\\A CIRCULOS CIUDADANOS\\\\A CRM\\\\BCKP\\\\DB\\\\DB 15MAY2026\\\\localhost \\(2\\).sql\"\\).Length / 1MB)"
+      "PowerShell(\\(Get-Item \"D:\\\\OneDrive\\\\A Movimiento Ciudadano\\\\A CIRCULOS CIUDADANOS\\\\A CRM\\\\BCKP\\\\DB\\\\DB 15MAY2026\\\\localhost \\(2\\).sql\"\\).Length / 1MB)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" ls-files)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" remote -v)",
+      "PowerShell(gh auth status)"
     ],
     "deny": [
       "Bash(rm -rf *)",
