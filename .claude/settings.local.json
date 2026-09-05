@@ -408,7 +408,13 @@
       "Bash(git -C \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" remote set-url origin \"https://TMSMnx@github.com/TMSMnx/TerriTOPS.git\")",
       "Bash(git -C \"C:/dev/ine-extract-evals\" remote get-url origin)",
       "Bash(git -C \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" remote get-url origin)",
-      "WebFetch(domain:ponchovidales.mx)"
+      "WebFetch(domain:ponchovidales.mx)",
+      "Bash(find \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/10JUN2026 REVCYBSEC/public_html/js\" -type f | sort)",
+      "Bash(cat \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/10JUN2026 REVCYBSEC/public_html/changelog.txt\")",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" status)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" diff .claude/settings.local.json)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" add .claude/settings.local.json)",
+      "Bash(git -C 'D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html' commit -m ' *)"
     ],
     "deny": [
       "Bash(rm -rf *)",
