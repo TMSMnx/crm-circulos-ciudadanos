@@ -381,7 +381,16 @@
       "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web/admin\" && ls -la && echo \"=== LINES ===\" && wc -l *.php)",
       "Bash(git commit -m '@ *)",
       "Bash(cd \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" && echo \"=== Referencias a /crm o crm/ ===\" && grep -rn \"/crm\\\\|crm/\\\\|'crm'\\\\|\\\\\"crm\\\\\"\" --include=*.php --include=*.js --include=*.json --include=*.html . 2>/dev/null | grep -v node_modules | head -40)",
-      "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web\" && echo \"=== El sitio publico enlaza al CRM? ===\" && grep -rn \"/crm\\\\|territops\\\\|TerriTOPS\\\\|Territops\" --include=*.html --include=*.php --include=*.js . 2>/dev/null | head -20 && echo \"\\(sin resultados = no hay enlace\\)\")"
+      "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/DIP FED PONCHO VIDALES/WEB PV DIPFED/ponchovidales-web\" && echo \"=== El sitio publico enlaza al CRM? ===\" && grep -rn \"/crm\\\\|territops\\\\|TerriTOPS\\\\|Territops\" --include=*.html --include=*.php --include=*.js . 2>/dev/null | head -20 && echo \"\\(sin resultados = no hay enlace\\)\")",
+      "Bash(node -e \"const v=require\\('./public_html/version.json'\\); console.log\\('v'+v.version, '| cambios en 1.5.0:', v.changelog[0].cambios.length\\)\")",
+      "Bash(sed -i 's|TerritoriOp — Esquema de Base de Datos v1.0|TerriTOPS — Esquema de Base de Datos v1.0|' config/install.sql)",
+      "Bash(sed -i 's|TerritoriOp — Datos iniciales|TerriTOPS — Datos iniciales|' config/setup_demo.sql)",
+      "Bash(sed -i 's|/\\\\* TerritoriOp — Dashboard CSS v1.0 \\\\*/|/* TerriTOPS — Dashboard CSS v1.0 */|' public_html/assets/css/app.css)",
+      "Bash(php -l public_html/api.php)",
+      "Bash(php -l config/TerriTOPS_secrets.php)",
+      "Bash(node --check public_html/assets/js/app.js)",
+      "Bash(node -e \"require\\('./public_html/version.json'\\)\")",
+      "Bash(grep -v \"^\\\\.$\\\\|^\\\\.\\\\.$\")"
     ],
     "deny": [
       "Bash(rm -rf *)",
