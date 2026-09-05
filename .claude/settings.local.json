@@ -407,7 +407,8 @@
       "Bash(git -C \"C:/dev/ine-extract-evals\" remote set-url origin \"https://Manx077@github.com/Manx077/ine-extract-evals.git\")",
       "Bash(git -C \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" remote set-url origin \"https://TMSMnx@github.com/TMSMnx/TerriTOPS.git\")",
       "Bash(git -C \"C:/dev/ine-extract-evals\" remote get-url origin)",
-      "Bash(git -C \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" remote get-url origin)"
+      "Bash(git -C \"D:/OneDrive/A TMS/PM DEVs/TerriTOPS\" remote get-url origin)",
+      "WebFetch(domain:ponchovidales.mx)"
     ],
     "deny": [
       "Bash(rm -rf *)",
