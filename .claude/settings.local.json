@@ -419,7 +419,12 @@
       "PowerShell(\\(Get-Item \"D:\\\\OneDrive\\\\A Movimiento Ciudadano\\\\A CIRCULOS CIUDADANOS\\\\A CRM\\\\BCKP\\\\DB\\\\DB 15MAY2026\\\\localhost \\(2\\).sql\"\\).Length / 1MB)",
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" ls-files)",
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" remote -v)",
-      "PowerShell(gh auth status)"
+      "PowerShell(gh auth status)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" remote add origin \"https://TMSMnx@github.com/TMSMnx/crm-circulos-ciudadanos.git\")",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" push -u origin main)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" add circmast.php)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" branch -a)",
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" log --oneline -5)"
     ],
     "deny": [
       "Bash(rm -rf *)",
