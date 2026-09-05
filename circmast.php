@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * admin-console.php — TerritoriOp CRM
  * Consola Administrativa Out-of-Band v1.0
@@ -24,7 +24,7 @@
 // CONFIGURACIÓN — CAMBIAR ANTES DE SUBIR A PRODUCCIÓN
 // ═══════════════════════════════════════════════════════════════════
 
-define('AC_TOKEN',           'B5ukHHyvffwGBTgQ8LDDy5yLNyKAvW6b');
+define('AC_TOKEN',           'lflIChPaiR-hIzf1qz_4QZ2uhA3uZ5SzmN4MLbBTIyo');
 define('AC_IPS_PERMITIDAS',  [
     '187.170.*.*',   // Telmex Infinitum Fibra — CDMX (rango asignado a 187.170.x.x)
     // Si en algún momento cambia el segundo octeto, agrega la nueva línea aquí
