@@ -424,7 +424,12 @@
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" push -u origin main)",
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" add circmast.php)",
       "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" branch -a)",
-      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" log --oneline -5)"
+      "Bash(git -C \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP/CRM25ABR2026/public_html\" log --oneline -5)",
+      "Bash(grep -iE \"\\\\.csv$|import\")",
+      "Bash(gh repo *)",
+      "Bash(cd \"D:/OneDrive/A Movimiento Ciudadano/A CIRCULOS CIUDADANOS/A CRM/BCKP\" && ls -1 && echo \"=== DB ===\" && ls -1 \"DB\" 2>/dev/null && echo \"=== version ===\" && cat \"CRM25ABR2026/public_html/version.json\" && echo && echo \"=== REVCYBSEC existe? ===\" && ls -1 \"10JUN2026 REVCYBSEC/public_html\" 2>/dev/null | head -5)",
+      "Bash(git checkout *)",
+      "Bash(git commit -m '@ *)"
     ],
     "deny": [
       "Bash(rm -rf *)",
